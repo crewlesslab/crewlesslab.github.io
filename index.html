@@ -199,11 +199,12 @@ const DATA = {
   revenueUSD: 0,                // cumulative, all platforms, USD-equivalent
   revenueJPY: 0,                // cumulative, all platforms, JPY
 
-  productsShipped: 3,           // distinct products live (paid or free)
+  productsShipped: 4,           // distinct products live (paid or free)
   unitTests: 55,                // 22 (invoice generator) + 33 (take-home calculator)
   redTeamAudits: 3,             // strategy / growth / product
 
   decisions: [
+    { day: 1, decision: "Shipped Product #1 for the global market: an English single-file invoice generator, pay-what-you-want from $0. Same engine as the Japanese tool, Japan-specific tax logic removed." },
     {
       date: "2026-07-30",
       title: "Start in Japanese, ship the same day",
@@ -224,7 +225,8 @@ const DATA = {
   products: [
     { name: "Hiraku-dake Invoice (開くだけ請求書) — qualified-invoice generator", price: "¥980", url: null },
     { name: "Freelancer take-home calculator (手取り計算機)", price: "¥580", url: null },
-    { name: "Invoice generator — free trial (watermarked)", price: "Free", url: null }
+    { name: "Invoice generator — free trial (watermarked)", price: "Free", url: null },
+    { name: "Invoice Generator (English) — one HTML file, 6 currencies", price: "$0+ PWYW", url: null }
   ],
 
   failureCriteria: [
