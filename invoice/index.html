@@ -1,0 +1,1847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="only light">
+<title>Invoice Generator — Free Invoice, Quote &amp; Receipt Maker</title>
+<style>
+/* ==========================================================
+   Invoice Generator (International Edition)
+   Single HTML file / no external dependencies / data stays
+   in localStorage on this device only.
+   ========================================================== */
+
+:root{
+  --navy:#1e3a5f;
+  --navy-deep:#152a46;
+  --accent:#2f5d8f;
+  --accent-bright:#3f83c9;
+  --accent-soft:#e9eff6;
+  --bg:#f2f4f8;
+  --card:#ffffff;
+  --border:#d8dee7;
+  --border-strong:#b6c0cd;
+  --text:#243140;
+  --muted:#67748a;
+  --danger:#b3372f;
+  --warn-bg:#fff7e0;
+  --warn-border:#e3c977;
+  --warn-text:#7a5b12;
+}
+
+*{box-sizing:border-box;}
+[hidden]{display:none !important;}
+
+html,body{height:100%;}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Helvetica Neue",Arial,sans-serif;
+  font-size:14px;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ---------- App layout ---------- */
+.app{display:flex;flex-direction:column;height:100vh;}
+.app-main{flex:1;display:flex;min-height:0;}
+
+/* ---------- Header ---------- */
+.app-header{
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  padding:10px 16px;
+  background:var(--navy-deep);
+  color:#fff;
+  box-shadow:0 1px 4px rgba(10,20,40,.25);
+  z-index:10;
+}
+.app-brand{display:flex;align-items:center;gap:10px;margin-right:auto;}
+.app-logo{
+  width:30px;height:30px;border-radius:7px;flex:none;
+  background:#fff;color:var(--navy-deep);
+  display:flex;align-items:center;justify-content:center;
+  font-weight:800;font-size:14px;letter-spacing:-.02em;
+}
+.app-header h1{font-size:15px;font-weight:700;margin:0;letter-spacing:.02em;}
+.app-header .sub{font-size:11px;color:#9fb2ca;font-weight:500;}
+.app-actions{display:flex;gap:6px;flex-wrap:wrap;align-items:center;}
+
+/* ---------- Buttons ---------- */
+.btn{
+  border:1px solid transparent;border-radius:7px;
+  padding:7px 13px;font:inherit;font-size:13px;font-weight:600;
+  cursor:pointer;white-space:nowrap;
+  transition:background .15s,border-color .15s,color .15s;
+}
+.btn:active{transform:translateY(1px);}
+.btn-ghost{background:transparent;color:#e8edf4;border-color:rgba(255,255,255,.4);}
+.btn-ghost:hover{background:rgba(255,255,255,.13);}
+.btn-primary{background:var(--accent-bright);color:#fff;}
+.btn-primary:hover{background:#3572ad;}
+.btn-soft{background:var(--accent-soft);color:var(--navy);border-color:#c6d4e3;}
+.btn-soft:hover{background:#dbe6f1;}
+.btn-danger-soft{background:#fbeeed;color:var(--danger);border-color:#e6c3bf;}
+.btn-danger-soft:hover{background:#f6dedb;}
+.btn-sm{padding:4px 10px;font-size:12px;border-radius:6px;}
+
+.ibtn{
+  width:27px;height:27px;flex:none;
+  border:1px solid var(--border-strong);background:#fff;border-radius:6px;
+  cursor:pointer;font-size:13px;line-height:1;color:var(--muted);
+  display:inline-flex;align-items:center;justify-content:center;
+  transition:color .15s,border-color .15s,background .15s;
+}
+.ibtn:hover{color:var(--navy);border-color:var(--navy);}
+.ibtn:disabled{opacity:.3;cursor:default;}
+.ibtn:disabled:hover{color:var(--muted);border-color:var(--border-strong);}
+.ibtn.danger:hover{color:var(--danger);border-color:var(--danger);background:#fbeeed;}
+
+/* ---------- Document type segmented control ---------- */
+.segmented{display:flex;gap:0;border:1px solid var(--border-strong);border-radius:8px;overflow:hidden;}
+.segmented button{
+  flex:1;padding:8px 4px;border:none;background:#fff;color:var(--muted);
+  font:inherit;font-size:13px;font-weight:600;cursor:pointer;
+  border-right:1px solid var(--border);
+  transition:background .15s,color .15s;
+}
+.segmented button:last-child{border-right:none;}
+.segmented button:hover{background:var(--accent-soft);color:var(--navy);}
+.segmented button.active{background:var(--navy);color:#fff;}
+
+/* ---------- Tabs (narrow screens) ---------- */
+.pane-tabs{display:none;background:var(--navy-deep);padding:0 12px 10px;gap:8px;}
+.pane-tabs .tab{
+  flex:1;padding:8px;border-radius:7px;border:1px solid rgba(255,255,255,.35);
+  background:transparent;color:#dbe4ef;font:inherit;font-size:13px;font-weight:600;cursor:pointer;
+}
+.pane-tabs .tab.active{background:#fff;color:var(--navy-deep);border-color:#fff;}
+
+/* ---------- Form pane ---------- */
+.form-pane{
+  width:47%;min-width:400px;max-width:600px;
+  overflow-y:auto;
+  padding:16px 16px 60px;
+  background:var(--bg);
+  border-right:1px solid var(--border);
+}
+
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:9px;
+  margin-bottom:14px;
+  box-shadow:0 1px 2px rgba(30,50,80,.05);
+}
+.card-head{
+  padding:10px 14px;
+  font-weight:700;font-size:13px;color:var(--navy);
+  border-bottom:1px solid var(--border);
+  display:flex;justify-content:space-between;align-items:center;gap:8px;
+}
+.card-body{padding:12px 14px;display:flex;flex-direction:column;gap:10px;}
+
+details.card summary{
+  padding:10px 14px;
+  font-weight:700;font-size:13px;color:var(--navy);
+  cursor:pointer;list-style:none;
+  display:flex;justify-content:space-between;align-items:center;
+}
+details.card summary::-webkit-details-marker{display:none;}
+details.card summary::after{content:"Show";font-size:11px;color:var(--muted);font-weight:500;}
+details.card[open] summary::after{content:"Hide";}
+details.card[open] summary{border-bottom:1px solid var(--border);}
+
+/* ---------- Form controls ---------- */
+.f-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.f-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+.f-field{display:flex;flex-direction:column;gap:4px;min-width:0;}
+.f-field.span2{grid-column:span 2;}
+.f-field>label{font-size:11.5px;font-weight:600;color:var(--muted);}
+.f-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+
+input[type=text],input[type=date],input[type=number],input[type=email],input[type=tel],select,textarea{
+  border:1px solid var(--border-strong);
+  border-radius:6px;
+  padding:7px 9px;
+  font:inherit;font-size:13.5px;
+  background:#fff;color:var(--text);
+  width:100%;
+}
+input:focus,select:focus,textarea:focus{
+  outline:2px solid var(--accent-bright);outline-offset:-1px;border-color:var(--accent-bright);
+}
+textarea{resize:vertical;min-height:60px;}
+input[type=checkbox]{width:16px;height:16px;accent-color:var(--navy);}
+input.invalid{border-color:var(--danger);background:#fdf4f3;}
+
+.check-label{display:flex;align-items:center;gap:8px;font-size:13.5px;cursor:pointer;font-weight:600;}
+.hint{font-size:11.5px;color:var(--muted);line-height:1.5;}
+.field-error{color:var(--danger);font-size:11.5px;display:none;}
+.field-error.show{display:block;}
+.notice{
+  background:var(--warn-bg);border:1px solid var(--warn-border);color:var(--warn-text);
+  padding:8px 11px;border-radius:7px;font-size:12px;line-height:1.6;
+}
+
+/* ---------- Line item editor ---------- */
+.item-row{
+  border:1px solid var(--border);border-radius:8px;
+  padding:8px;display:flex;flex-direction:column;gap:6px;
+  background:#fafcfe;
+}
+.item-row-top{display:flex;gap:6px;align-items:center;}
+.item-row-top .item-no{
+  flex:none;width:22px;text-align:center;
+  font-size:11px;font-weight:700;color:var(--muted);
+}
+.item-row-top input{flex:1;}
+.item-row-grid{display:grid;grid-template-columns:80px 70px 1fr 120px;gap:6px;padding-left:28px;}
+.mini{display:flex;flex-direction:column;gap:2px;min-width:0;}
+.mini>label{font-size:10.5px;color:var(--muted);font-weight:600;}
+.mini input,.mini select{padding:5px 7px;font-size:13px;}
+.item-amount{
+  display:flex;align-items:center;justify-content:flex-end;
+  font-weight:700;font-size:13.5px;color:var(--navy);
+  font-variant-numeric:tabular-nums;
+  padding:5px 7px;background:var(--accent-soft);border-radius:6px;
+  overflow:hidden;
+}
+.items-subline{
+  display:flex;justify-content:flex-end;gap:14px;
+  font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums;
+}
+.items-subline b{color:var(--navy);}
+
+/* ---------- Image upload ---------- */
+.upload-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.upload-row .thumb{
+  height:42px;max-width:120px;border:1px solid var(--border);border-radius:5px;
+  background:#fff;padding:3px;object-fit:contain;display:none;
+}
+.upload-row .thumb.show{display:block;}
+input[type=file]{font-size:12px;max-width:210px;}
+
+/* ---------- Preview pane ---------- */
+.preview-pane{
+  flex:1;overflow:auto;
+  background:#d9dfe9;
+  display:flex;flex-direction:column;
+}
+.preview-toolbar{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 16px;
+  background:#e8ecf2;border-bottom:1px solid var(--border);
+  font-size:12px;color:var(--muted);
+  position:sticky;top:0;z-index:5;
+}
+.preview-toolbar b{color:var(--navy);font-size:12.5px;}
+.preview-scroll{flex:1;padding:22px;}
+.sheet-scaler{transform-origin:top left;margin:0 auto;}
+
+/* ==========================================================
+   Document sheet styles - shared by screen and print.
+   Screen shows a 210mm-wide page; content is designed to fit
+   one page on both A4 (210x297mm) and US Letter (216x279mm).
+   ========================================================== */
+.sheet{
+  position:relative;
+  width:210mm;min-height:270mm;
+  background:#fff;color:#1b2430;
+  padding:13mm 14mm 12mm;
+  font-size:10.5pt;line-height:1.55;
+  box-shadow:0 3px 16px rgba(20,35,60,.22);
+  -webkit-print-color-adjust:exact;print-color-adjust:exact;
+}
+
+.s-top{display:flex;justify-content:space-between;align-items:flex-start;gap:6mm;}
+.s-top-spacer{flex:1;}
+.s-meta{font-size:9.5pt;min-width:52mm;}
+.s-meta-row{display:flex;justify-content:space-between;gap:4mm;padding:.4mm 0;}
+.s-meta-row .k{color:#5a6675;}
+.s-meta-row .v{font-variant-numeric:tabular-nums;text-align:right;}
+
+.s-title{
+  text-align:center;
+  font-size:19pt;font-weight:600;color:var(--navy);
+  letter-spacing:.28em;text-indent:.28em;
+  border-bottom:3px double var(--navy);
+  padding-bottom:2mm;margin:1mm 0 6mm;
+}
+
+.s-parties{display:flex;justify-content:space-between;align-items:flex-start;gap:10mm;margin-bottom:5mm;}
+.s-client{flex:1;min-width:0;padding-top:1mm;}
+.s-billto{font-size:8pt;font-weight:700;letter-spacing:.14em;color:#5a6675;margin-bottom:1mm;}
+.s-client-name{
+  font-size:13pt;font-weight:600;
+  border-bottom:1px solid #3a4552;
+  padding-bottom:1mm;margin-bottom:1.5mm;
+}
+.s-client-addr{font-size:9.5pt;color:#333;}
+.s-message{margin-top:3.5mm;font-size:10pt;}
+
+.s-amount{
+  display:flex;justify-content:space-between;align-items:baseline;gap:4mm;
+  border-top:2px solid var(--navy);border-bottom:2px solid var(--navy);
+  background:var(--accent-soft);
+  padding:2.6mm 3mm;margin-top:3.5mm;
+}
+.s-amount .lbl{font-size:11pt;font-weight:700;color:var(--navy);}
+.s-amount .val{font-size:16.5pt;font-weight:700;font-variant-numeric:tabular-nums;}
+.s-amount .val small{font-size:9pt;font-weight:600;color:#445;margin-left:1.5mm;}
+
+.s-issuer{width:64mm;flex:none;position:relative;font-size:9.5pt;padding-top:1mm;padding-right:2mm;}
+.s-issuer-logo{display:block;max-height:13mm;max-width:44mm;margin-bottom:1.5mm;}
+.s-issuer-name{font-size:11.5pt;font-weight:700;margin-bottom:.8mm;}
+.s-issuer-line{color:#333;}
+.s-issuer-reg{margin-top:1.2mm;font-weight:600;}
+
+.s-subject{font-size:10.5pt;margin:0 0 3mm;}
+.s-subject .k{color:#5a6675;font-size:9.5pt;margin-right:2mm;}
+.s-subject .v{font-weight:600;border-bottom:1px solid #9aa5b1;padding:0 2mm .3mm 1mm;}
+
+/* Line item table */
+table.items{width:100%;border-collapse:collapse;margin-top:2mm;}
+table.items thead{display:table-header-group;}
+table.items th{
+  background:var(--accent-soft);color:var(--navy);
+  font-weight:700;font-size:9pt;
+  padding:1.8mm 2mm;
+  border:1px solid var(--navy);
+}
+table.items td{
+  border:1px solid #8d99a8;
+  padding:1.6mm 2mm;
+  font-size:9.8pt;vertical-align:top;
+}
+table.items tr{break-inside:avoid;page-break-inside:avoid;}
+table.items .c-no{width:9mm;text-align:center;color:#5a6675;}
+table.items .c-qty{width:16mm;text-align:right;font-variant-numeric:tabular-nums;}
+table.items .c-unit{width:15mm;text-align:center;}
+table.items .c-price{width:28mm;text-align:right;font-variant-numeric:tabular-nums;}
+table.items .c-amt{width:30mm;text-align:right;font-variant-numeric:tabular-nums;}
+table.items td.empty{border-left:1px solid #8d99a8;border-right:1px solid #8d99a8;color:transparent;}
+
+/* Totals */
+.s-summary{
+  display:flex;justify-content:space-between;align-items:flex-start;gap:10mm;
+  margin-top:4mm;break-inside:avoid;page-break-inside:avoid;
+}
+.s-notearea{flex:1;min-width:0;}
+.s-footnote{font-size:8.5pt;color:#555;margin-top:1.6mm;line-height:1.6;}
+
+.s-totals{width:70mm;flex:none;font-size:10pt;}
+.s-totals .trow{
+  display:flex;justify-content:space-between;gap:3mm;
+  padding:1.3mm 1mm;border-bottom:1px solid #c3ccd6;
+  font-variant-numeric:tabular-nums;
+}
+.s-totals .trow .k{color:#39434f;}
+.s-totals .trow.grand{
+  border-top:2px solid var(--navy);border-bottom:2px solid var(--navy);
+  margin-top:1mm;padding:2mm 1mm;
+  font-weight:700;font-size:11.5pt;color:var(--navy);
+}
+
+/* Boxed sections (payment details / notes) */
+.s-box{
+  border:1px solid #8d99a8;
+  padding:2.5mm 3mm 2.8mm;margin-top:4mm;
+  font-size:9.5pt;break-inside:avoid;page-break-inside:avoid;
+}
+.s-box-title{font-weight:700;font-size:9pt;color:var(--navy);margin-bottom:1mm;}
+
+/* Brand credit (small footer line on the sheet) */
+.s-credit{
+  margin-top:7mm;text-align:center;
+  font-size:7pt;color:#9aa3af;letter-spacing:.02em;
+}
+
+/* ---------- Modal ---------- */
+.modal-backdrop{
+  position:fixed;inset:0;background:rgba(15,25,40,.55);
+  display:none;align-items:center;justify-content:center;z-index:50;padding:20px;
+}
+.modal-backdrop.show{display:flex;}
+.modal{
+  background:#fff;border-radius:11px;
+  width:min(760px,100%);max-height:82vh;
+  display:flex;flex-direction:column;overflow:hidden;
+  box-shadow:0 10px 40px rgba(10,20,40,.35);
+}
+.modal-head{
+  padding:13px 18px;border-bottom:1px solid var(--border);
+  display:flex;justify-content:space-between;align-items:center;
+  font-weight:700;color:var(--navy);
+}
+.modal-body{overflow-y:auto;padding:6px 0;}
+.hist-item{
+  display:flex;justify-content:space-between;gap:10px;align-items:center;
+  padding:10px 18px;border-bottom:1px solid var(--border);
+}
+.hist-item:last-child{border-bottom:none;}
+.hist-info{min-width:0;}
+.hist-line1{font-weight:700;font-size:13.5px;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;}
+.hist-type{
+  font-size:11px;font-weight:700;color:var(--navy);
+  background:var(--accent-soft);border-radius:4px;padding:1px 7px;flex:none;
+}
+.hist-line2{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;}
+.hist-actions{display:flex;gap:6px;flex:none;}
+.modal-empty{padding:36px 18px;text-align:center;color:var(--muted);font-size:13px;}
+
+/* ---------- Toast ---------- */
+.toast{
+  position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(8px);
+  background:var(--navy-deep);color:#fff;
+  padding:10px 20px;border-radius:8px;font-size:13px;font-weight:600;
+  opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;
+  z-index:99;max-width:90%;box-shadow:0 4px 16px rgba(10,20,40,.3);
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.toast.error{background:var(--danger);}
+
+/* ---------- Narrow screens (tab switching) ---------- */
+@media screen and (max-width: 940px){
+  .app{height:auto;min-height:100vh;}
+  .app-main{flex-direction:column;}
+  .pane-tabs{display:flex;}
+  .form-pane{width:auto;min-width:0;max-width:none;border-right:none;overflow:visible;}
+  .preview-pane{overflow:visible;}
+  .app.view-form .preview-pane{display:none;}
+  .app.view-preview .form-pane{display:none;}
+  .preview-scroll{padding:14px;overflow-x:auto;}
+}
+
+/* ==========================================================
+   Print (use the browser's "Save as PDF" for a PDF copy).
+   No @page size is forced, so the document prints on the
+   user's default paper - A4 or US Letter. The sheet fills the
+   paper width and the generous inner padding acts as margins
+   on both sizes; content is kept short enough for one Letter
+   page (279mm), which also guarantees one A4 page (297mm).
+   ========================================================== */
+@page{margin:0;}
+@media print{
+  /* Blank filler rows are screen-only decoration */
+  .items tr.filler{display:none;}
+  html,body{height:auto;background:#fff;}
+  .app{display:block;height:auto;}
+  .app-main{display:block;min-height:0;}
+  .app-header,.pane-tabs,.form-pane,.preview-toolbar,.no-print{display:none !important;}
+  .preview-pane{display:block !important;overflow:visible;background:#fff;}
+  .preview-scroll{padding:0;overflow:visible;}
+  .sheet-scaler{transform:none !important;width:auto !important;height:auto !important;margin:0;}
+  .sheet{
+    width:auto;min-height:0;
+    margin:0;box-shadow:none;
+    padding:13mm 14mm 10mm;
+  }
+  .modal-backdrop,.toast{display:none !important;}
+}
+</style>
+</head>
+<body>
+<div class="app view-form" id="app">
+
+  <!-- Header -->
+  <header class="app-header">
+    <div class="app-brand">
+      <div class="app-logo">IN</div>
+      <div>
+        <h1>Invoice Generator</h1>
+        <div class="sub">Invoices, quotes, delivery notes &amp; receipts. Your data never leaves this device.</div>
+      </div>
+    </div>
+    <div class="app-actions">
+      <button id="btnNew" class="btn btn-ghost" type="button">New</button>
+      <button id="btnSave" class="btn btn-ghost" type="button">Save</button>
+      <button id="btnHistory" class="btn btn-ghost" type="button">History</button>
+      <button id="btnExport" class="btn btn-ghost" type="button">Export</button>
+      <button id="btnImport" class="btn btn-ghost" type="button">Import</button>
+      <input type="file" id="importFile" accept=".json,application/json" hidden>
+      <button id="btnPrint" class="btn btn-primary" type="button">Print / Save PDF</button>
+    </div>
+  </header>
+
+  <!-- Tabs for narrow screens -->
+  <div class="pane-tabs">
+    <button id="tabForm" class="tab active" type="button">Edit</button>
+    <button id="tabPreview" class="tab" type="button">Preview</button>
+  </div>
+
+  <main class="app-main">
+
+    <!-- ================= Form ================= -->
+    <section class="form-pane" id="formPane">
+
+      <!-- Document type -->
+      <div class="card">
+        <div class="card-head">Document Type</div>
+        <div class="card-body">
+          <div class="segmented" id="docTypeSeg">
+            <button type="button" data-type="invoice" class="active">Invoice</button>
+            <button type="button" data-type="quote">Quote</button>
+            <button type="button" data-type="delivery">Delivery Note</button>
+            <button type="button" data-type="receipt">Receipt</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Basics -->
+      <div class="card">
+        <div class="card-head">Basics</div>
+        <div class="card-body">
+          <div class="f-grid">
+            <div class="f-field">
+              <label for="docNumber">Document Number</label>
+              <div class="f-row" style="flex-wrap:nowrap;">
+                <input type="text" id="docNumber" autocomplete="off">
+                <button type="button" id="btnRenumber" class="btn btn-soft btn-sm" title="Generate a new number">Renumber</button>
+              </div>
+            </div>
+            <div class="f-field">
+              <label for="issueDate">Issue Date</label>
+              <input type="date" id="issueDate">
+            </div>
+            <div class="f-field" id="dueDateField">
+              <label for="dueDate" id="dueDateLabel">Payment Due</label>
+              <input type="date" id="dueDate">
+            </div>
+            <div class="f-field span2">
+              <label for="subject">Subject (optional)</label>
+              <input type="text" id="subject" placeholder="e.g. Website design project">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bill To -->
+      <div class="card">
+        <div class="card-head">
+          <span>Bill To</span>
+          <div class="f-row">
+            <button type="button" id="btnClientSave" class="btn btn-soft btn-sm">Save this client</button>
+            <button type="button" id="btnClientDelete" class="btn btn-danger-soft btn-sm">Delete saved client</button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="f-field">
+            <label for="clientSelect">Load a saved client</label>
+            <select id="clientSelect">
+              <option value="">(Select a client)</option>
+            </select>
+          </div>
+          <div class="f-grid">
+            <div class="f-field span2">
+              <label for="clientName">Client Name</label>
+              <input type="text" id="clientName" placeholder="e.g. Acme Corporation" autocomplete="off">
+            </div>
+            <div class="f-field span2">
+              <label for="clientAddress">Address (optional, multiline)</label>
+              <textarea id="clientAddress" rows="2" placeholder="123 Main Street&#10;Springfield, ST 12345"></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Line items -->
+      <div class="card">
+        <div class="card-head">
+          <span>Line Items</span>
+          <button type="button" id="btnAddItem" class="btn btn-soft btn-sm">+ Add line</button>
+        </div>
+        <div class="card-body">
+          <div id="itemsEditor" style="display:flex;flex-direction:column;gap:8px;"></div>
+          <div class="items-subline" id="itemsSubline"></div>
+          <p class="hint">Enter unit prices <b>before tax</b>. For a discount, use a negative unit price.</p>
+        </div>
+      </div>
+
+      <!-- Currency & tax -->
+      <div class="card">
+        <div class="card-head">Currency &amp; Tax</div>
+        <div class="card-body">
+          <div class="f-grid">
+            <div class="f-field">
+              <label for="currencySel">Currency</label>
+              <select id="currencySel"></select>
+            </div>
+            <div class="f-field">
+              <label for="taxLabelSel">Tax Label</label>
+              <select id="taxLabelSel">
+                <option value="Tax">Tax</option>
+                <option value="VAT">VAT</option>
+                <option value="GST">GST</option>
+              </select>
+            </div>
+            <div class="f-field">
+              <label for="taxRate">Tax Rate (%)</label>
+              <input type="number" id="taxRate" min="0" max="100" step="0.01" placeholder="0">
+            </div>
+            <div class="f-field">
+              <label for="taxRounding">Tax Rounding</label>
+              <select id="taxRounding">
+                <option value="round">Round half up (common)</option>
+                <option value="floor">Round down</option>
+                <option value="ceil">Round up</option>
+              </select>
+            </div>
+          </div>
+          <p class="hint">A single tax rate is applied to the whole subtotal, rounded once. Set the rate to 0 to hide the tax line entirely.</p>
+        </div>
+      </div>
+
+      <!-- Payment details -->
+      <div class="card">
+        <div class="card-head">Payment Details (shown on invoices)</div>
+        <div class="card-body">
+          <textarea id="payment" rows="3" placeholder="Bank: First National Bank&#10;Account: 12345678 / Routing: 987654&#10;IBAN / SWIFT / PayPal - anything your clients need"></textarea>
+          <p class="hint">Carried over automatically to new documents.</p>
+        </div>
+      </div>
+
+      <!-- Notes -->
+      <div class="card">
+        <div class="card-head">Notes</div>
+        <div class="card-body">
+          <textarea id="notes" rows="3" placeholder="e.g. Payment is due within 30 days. Thank you for your business!"></textarea>
+        </div>
+      </div>
+
+      <!-- Issuer (your business) -->
+      <details class="card" id="issuerCard" open>
+        <summary>Your Business (saved automatically)</summary>
+        <div class="card-body">
+          <div class="f-grid">
+            <div class="f-field span2">
+              <label for="issuerName">Business / Your Name</label>
+              <input type="text" id="issuerName" placeholder="e.g. Jane Doe Design Studio" autocomplete="off">
+            </div>
+            <div class="f-field span2">
+              <label for="issuerAddress">Address (multiline)</label>
+              <textarea id="issuerAddress" rows="2" placeholder="456 Oak Avenue&#10;Portland, OR 97201"></textarea>
+            </div>
+            <div class="f-field">
+              <label for="issuerPhone">Phone</label>
+              <input type="tel" id="issuerPhone" placeholder="+1 555 123 4567" autocomplete="off">
+            </div>
+            <div class="f-field">
+              <label for="issuerEmail">Email</label>
+              <input type="email" id="issuerEmail" placeholder="hello@example.com" autocomplete="off">
+            </div>
+            <div class="f-field span2">
+              <label for="issuerTaxId">Tax ID (optional, free format)</label>
+              <input type="text" id="issuerTaxId" placeholder="e.g. VAT GB123456789 / EIN 12-3456789 / ABN 51 824 753 556" autocomplete="off">
+              <span class="hint">Printed under your business details. Leave blank if not needed.</span>
+            </div>
+            <div class="f-field span2">
+              <label>Logo (optional, shown next to your details)</label>
+              <div class="upload-row">
+                <input type="file" id="logoInput" accept="image/*">
+                <img id="logoThumb" class="thumb" alt="Logo preview">
+                <button type="button" id="btnLogoRemove" class="btn btn-danger-soft btn-sm">Remove</button>
+              </div>
+              <span class="hint">A PNG with a transparent background works best. Images are resized automatically before saving.</span>
+            </div>
+          </div>
+        </div>
+      </details>
+
+      <p class="hint" style="text-align:center;">
+        Everything is saved automatically in this browser only - nothing is ever uploaded.<br>
+        Press Ctrl (Mac: Cmd) + S to save the current document to History.<br>
+        <a href="https://crewlesslab.github.io" style="color:var(--muted);">Made by Crewless Lab - an AI-operated studio. crewlesslab.github.io</a>
+      </p>
+    </section>
+
+    <!-- ================= Preview ================= -->
+    <section class="preview-pane" id="previewPane">
+      <div class="preview-toolbar">
+        <b>Preview</b>
+        <span>Prints on a single page - both A4 and US Letter</span>
+        <span style="margin-left:auto;"></span>
+        <button type="button" id="btnPrint2" class="btn btn-soft btn-sm no-print">Print / Save PDF</button>
+      </div>
+      <div class="preview-scroll" id="previewScroll">
+        <div class="sheet-scaler" id="sheetScaler">
+          <div class="sheet" id="sheet"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- History modal -->
+<div class="modal-backdrop" id="historyModal">
+  <div class="modal" role="dialog" aria-modal="true" aria-label="Saved documents">
+    <div class="modal-head">
+      <span>Saved Documents</span>
+      <button type="button" id="btnHistoryClose" class="btn btn-soft btn-sm">Close</button>
+    </div>
+    <div class="modal-body" id="historyList"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status"></div>
+<script>
+'use strict';
+/* ==========================================================================
+ * Invoice Generator (International Edition)
+ *
+ * Layout of this script:
+ *   1. Storage layer (localStorage, prefix "inven_")
+ *   2. Constants and utilities
+ *   3. Money math (integer arithmetic in minor units - no float errors)
+ *   4. Document state (create / sanitize / numbering)
+ *   5. Line item editor rendering
+ *   6. Sheet preview rendering (XSS-safe: textContent only)
+ *   7. Clients, history, export / import
+ *   8. Event binding and init
+ * ========================================================================== */
+
+/* ============================ 1. Storage layer ============================ */
+
+const LS_PREFIX = 'inven_';
+
+// If localStorage is unavailable (e.g. some private-browsing modes),
+// fall back to an in-memory store (data lasts for the session only).
+const rawStorage = (() => {
+  try {
+    const t = LS_PREFIX + '__test__';
+    localStorage.setItem(t, '1');
+    localStorage.removeItem(t);
+    return { impl: localStorage, persistent: true };
+  } catch (e) {
+    const mem = {};
+    return {
+      impl: {
+        getItem: (k) => (k in mem ? mem[k] : null),
+        setItem: (k, v) => { mem[k] = String(v); },
+        removeItem: (k) => { delete mem[k]; },
+      },
+      persistent: false,
+    };
+  }
+})();
+
+const store = {
+  get(key, fallback) {
+    try {
+      const raw = rawStorage.impl.getItem(LS_PREFIX + key);
+      if (raw === null || raw === undefined) return fallback;
+      return JSON.parse(raw);
+    } catch (e) {
+      return fallback;
+    }
+  },
+  set(key, value) {
+    try {
+      rawStorage.impl.setItem(LS_PREFIX + key, JSON.stringify(value));
+      return true;
+    } catch (e) {
+      showToast('Could not save. Browser storage may be full (the logo image might be too large).', true);
+      return false;
+    }
+  },
+  remove(key) {
+    try { rawStorage.impl.removeItem(LS_PREFIX + key); } catch (e) { /* noop */ }
+  },
+};
+
+/* ========================= 2. Constants and utilities ========================= */
+
+const DOC_TYPES = {
+  invoice:  { label: 'Invoice',       prefix: 'INV', amountLabel: 'Amount Due',  dueLabel: 'Payment Due', message: 'Please find the details of this invoice below.' },
+  quote:    { label: 'Quote',         prefix: 'QUO', amountLabel: 'Quote Total', dueLabel: 'Valid Until', message: 'We are pleased to quote as follows.' },
+  delivery: { label: 'Delivery Note', prefix: 'DLV', amountLabel: 'Total',       dueLabel: null,          message: 'The following items have been delivered.' },
+  receipt:  { label: 'Receipt',       prefix: 'RCT', amountLabel: 'Amount Paid', dueLabel: null,          message: null },
+};
+
+const TAX_LABELS = ['Tax', 'VAT', 'GST'];
+
+const $  = (sel, root) => (root || document).querySelector(sel);
+const $$ = (sel, root) => Array.prototype.slice.call((root || document).querySelectorAll(sel));
+
+function el(tag, className, text) {
+  const node = document.createElement(tag);
+  if (className) node.className = className;
+  if (text !== undefined && text !== null) node.textContent = text; // XSS-safe: always textContent
+  return node;
+}
+
+// Append multiline text as a sequence of <div>s (no innerHTML anywhere)
+function appendMultiline(parent, text, className) {
+  String(text || '').split('\n').forEach((line) => {
+    const div = el('div', className, line === '' ? ' ' : line);
+    parent.appendChild(div);
+  });
+}
+
+function todayISO() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+function todayCompact() {
+  return todayISO().replace(/-/g, '');
+}
+
+// ISO date + n days (used for the default Net-30 due date)
+function addDaysISO(baseISO, days) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(baseISO || todayISO());
+  const d = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]) + days);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+function deepCopy(obj) {
+  return JSON.parse(JSON.stringify(obj));
+}
+
+let toastTimer = null;
+function showToast(msg, isError) {
+  const t = $('#toast');
+  if (!t) return;
+  t.textContent = msg;
+  t.classList.toggle('error', !!isError);
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), isError ? 4200 : 2400);
+}
+
+/* ============ 3. Money math (integer arithmetic in minor units) ============ */
+/* ===== CALC CORE START (pure functions - unit-tested in Node) ===== */
+
+// Supported currencies. "decimals" is the number of minor-unit digits:
+// JPY has none (amounts are whole yen); the others use 2 (cents/pence).
+const CURRENCIES = {
+  USD: { symbol: '$',      decimals: 2, name: 'USD - US Dollar' },
+  EUR: { symbol: '€', decimals: 2, name: 'EUR - Euro' },
+  GBP: { symbol: '£', decimals: 2, name: 'GBP - British Pound' },
+  JPY: { symbol: '¥', decimals: 0, name: 'JPY - Japanese Yen' },
+  AUD: { symbol: 'A$',     decimals: 2, name: 'AUD - Australian Dollar' },
+  CAD: { symbol: 'C$',     decimals: 2, name: 'CAD - Canadian Dollar' },
+};
+
+// Round n / d to an integer using the given mode (integer math only).
+// Negative values are rounded on their absolute value and re-signed,
+// so discount lines behave symmetrically.
+function divRound(n, d, mode) {
+  const neg = n < 0;
+  const a = Math.abs(n);
+  const q = Math.floor(a / d);
+  const r = a % d;
+  let v;
+  if (r === 0) v = q;
+  else if (mode === 'ceil') v = q + 1;
+  else if (mode === 'round') v = r * 2 >= d ? q + 1 : q;
+  else v = q; // floor
+  return neg ? -v : v;
+}
+
+// Convert a major-unit price (e.g. 19.99) to integer minor units (1999).
+// Math.round absorbs float representation error (19.99 * 100 = 1998.99...).
+function toMinor(major, currency) {
+  const dec = (CURRENCIES[currency] || CURRENCIES.USD).decimals;
+  const factor = Math.pow(10, dec);
+  return Math.round((Number(major) || 0) * factor);
+}
+
+// One line's amount in minor units (before tax).
+// Quantity supports 2 decimal places: scale it to an integer (x100) first,
+// multiply by the integer minor-unit price, then divide back with rounding.
+function lineAmount(item, currency, mode) {
+  const qtyC = Math.round((Number(item.qty) || 0) * 100);
+  const priceMinor = toMinor(item.price, currency);
+  return divRound(qtyC * priceMinor, 100, mode);
+}
+
+// Whole-document totals, all in integer minor units.
+// The tax rate supports 2 decimal places (e.g. 7.25%): scale it to integer
+// basis points (x100), multiply, then divide by 10000 with a single rounding.
+function calcTotals(doc) {
+  const mode = doc.rounding || 'round';
+  const currency = CURRENCIES[doc.currency] ? doc.currency : 'USD';
+  let subtotal = 0;
+  doc.items.forEach((item) => { subtotal += lineAmount(item, currency, mode); });
+  const rateBP = Math.round((Number(doc.taxRate) || 0) * 100);
+  const tax = divRound(subtotal * rateBP, 10000, mode);
+  const total = subtotal + tax;
+  return { subtotal, tax, total };
+}
+
+// Format integer minor units as a currency string, e.g. 1999 -> "$19.99",
+// -500 -> "-$5.00", JPY 1234 -> "¥1,234".
+function formatMoney(minor, currency) {
+  const cur = CURRENCIES[currency] || CURRENCIES.USD;
+  const v = Math.round(Number(minor) || 0);
+  const neg = v < 0;
+  const a = Math.abs(v);
+  let s;
+  if (cur.decimals === 0) {
+    s = a.toLocaleString('en-US');
+  } else {
+    const factor = Math.pow(10, cur.decimals);
+    const intPart = Math.floor(a / factor);
+    const frac = String(a % factor).padStart(cur.decimals, '0');
+    s = intPart.toLocaleString('en-US') + '.' + frac;
+  }
+  return (neg ? '-' : '') + cur.symbol + s;
+}
+
+/* ===== CALC CORE END ===== */
+
+/* =================== 4. Document state and numbering =================== */
+
+function newItem() {
+  return { name: '', qty: 1, unit: '', price: 0 };
+}
+
+function defaultIssuer() {
+  return { name: '', address: '', phone: '', email: '', taxId: '', logo: '' };
+}
+
+// Document numbering: e.g. INV-20260730-001 (sequence resets daily)
+function issueNumber(type) {
+  const d = todayCompact();
+  let seq = store.get('seq', { date: '', n: 0 });
+  if (!seq || seq.date !== d) seq = { date: d, n: 0 };
+  seq.n += 1;
+  store.set('seq', seq);
+  return `${DOC_TYPES[type].prefix}-${d}-${String(seq.n).padStart(3, '0')}`;
+}
+
+// When the document type changes, swap only the prefix of auto-generated numbers
+function retagNumber(number, type) {
+  if (/^(INV|QUO|DLV|RCT)-\d{8}-\d{3}$/.test(number)) {
+    return number.replace(/^(INV|QUO|DLV|RCT)/, DOC_TYPES[type].prefix);
+  }
+  return number;
+}
+
+// withNumber === false skips numbering (so sequence numbers are not wasted)
+function newDoc(withNumber) {
+  const issueDate = todayISO();
+  return {
+    id: null,
+    savedAt: null,
+    type: 'invoice',
+    number: withNumber === false ? '' : issueNumber('invoice'),
+    issueDate,
+    dueDate: addDaysISO(issueDate, 30),
+    subject: '',
+    client: { name: '', address: '' },
+    items: [newItem()],
+    currency: 'USD',
+    taxLabel: 'Tax',
+    taxRate: 0,
+    rounding: 'round',
+    payment: String(store.get('paymentDefault', '') || ''),
+    notes: '',
+  };
+}
+
+// Fill in any missing fields when loading stored data (forward compatibility)
+function sanitizeDoc(raw) {
+  const base = newDoc(false);
+  const d = (raw && typeof raw === 'object') ? Object.assign(base, raw) : base;
+  if (!DOC_TYPES[d.type]) d.type = 'invoice';
+  d.client = Object.assign({ name: '', address: '' }, (raw && raw.client) || {});
+  if (!Array.isArray(d.items) || d.items.length === 0) d.items = [newItem()];
+  d.items = d.items.map((it) => Object.assign(newItem(), it));
+  if (!CURRENCIES[d.currency]) d.currency = 'USD';
+  if (!TAX_LABELS.includes(d.taxLabel)) d.taxLabel = 'Tax';
+  const rate = Number(d.taxRate);
+  d.taxRate = Number.isFinite(rate) ? Math.min(100, Math.max(0, rate)) : 0;
+  if (!['floor', 'round', 'ceil'].includes(d.rounding)) d.rounding = 'round';
+  d.payment = String(d.payment || '');
+  if (!d.number) d.number = issueNumber(d.type); // number only if missing
+  return d;
+}
+
+/* ============================ App state ============================ */
+
+let issuer  = Object.assign(defaultIssuer(), store.get('issuer', {}));
+let clients = store.get('clients', []);
+if (!Array.isArray(clients)) clients = [];
+let doc = sanitizeDoc(store.get('draft', null));
+
+/* ---- Draft autosave (debounced) ---- */
+let draftTimer = null;
+function scheduleDraft() {
+  clearTimeout(draftTimer);
+  draftTimer = setTimeout(() => store.set('draft', doc), 350);
+}
+
+let issuerTimer = null;
+function scheduleIssuerSave() {
+  clearTimeout(issuerTimer);
+  issuerTimer = setTimeout(() => store.set('issuer', issuer), 350);
+}
+
+// Common handler for any document change
+function onDocChanged() {
+  renderPreview();
+  scheduleDraft();
+}
+
+/* ========================= 5. Line item editor ========================= */
+
+function iconBtn(symbol, title) {
+  const b = el('button', 'ibtn', symbol);
+  b.type = 'button';
+  b.title = title;
+  b.setAttribute('aria-label', title);
+  return b;
+}
+
+function miniField(labelText, inputEl) {
+  const wrap = el('div', 'mini');
+  wrap.appendChild(el('label', null, labelText));
+  wrap.appendChild(inputEl);
+  return wrap;
+}
+
+function buildItemRow(item, idx) {
+  const row = el('div', 'item-row');
+
+  /* Row 1: number + description + reorder / delete */
+  const top = el('div', 'item-row-top');
+  top.appendChild(el('div', 'item-no', String(idx + 1)));
+
+  const nameIn = document.createElement('input');
+  nameIn.type = 'text';
+  nameIn.placeholder = 'Description (e.g. Website design)';
+  nameIn.value = item.name;
+  nameIn.addEventListener('input', () => { item.name = nameIn.value; onDocChanged(); });
+  top.appendChild(nameIn);
+
+  const upBtn = iconBtn('↑', 'Move up');
+  upBtn.disabled = idx === 0;
+  upBtn.addEventListener('click', () => moveItem(idx, -1));
+  top.appendChild(upBtn);
+
+  const downBtn = iconBtn('↓', 'Move down');
+  downBtn.disabled = idx === doc.items.length - 1;
+  downBtn.addEventListener('click', () => moveItem(idx, 1));
+  top.appendChild(downBtn);
+
+  const delBtn = iconBtn('×', 'Delete line');
+  delBtn.classList.add('danger');
+  delBtn.addEventListener('click', () => removeItem(idx));
+  top.appendChild(delBtn);
+
+  row.appendChild(top);
+
+  /* Row 2: qty / unit / unit price / amount */
+  const grid = el('div', 'item-row-grid');
+
+  const amountCell = el('div', 'item-amount', formatMoney(lineAmount(item, doc.currency, doc.rounding), doc.currency));
+  const refreshAmount = () => {
+    amountCell.textContent = formatMoney(lineAmount(item, doc.currency, doc.rounding), doc.currency);
+  };
+
+  const qtyIn = document.createElement('input');
+  qtyIn.type = 'number';
+  qtyIn.step = '0.01';
+  qtyIn.value = String(item.qty);
+  qtyIn.addEventListener('input', () => {
+    const v = Number(qtyIn.value);
+    item.qty = Number.isFinite(v) ? v : 0;
+    refreshAmount();
+    onDocChanged();
+  });
+  grid.appendChild(miniField('Qty', qtyIn));
+
+  const unitIn = document.createElement('input');
+  unitIn.type = 'text';
+  unitIn.placeholder = 'hrs';
+  unitIn.value = item.unit;
+  unitIn.addEventListener('input', () => { item.unit = unitIn.value; onDocChanged(); });
+  grid.appendChild(miniField('Unit', unitIn));
+
+  const priceIn = document.createElement('input');
+  priceIn.type = 'number';
+  priceIn.step = '0.01';
+  priceIn.placeholder = '0.00';
+  priceIn.value = String(item.price);
+  priceIn.addEventListener('input', () => {
+    const v = Number(priceIn.value);
+    item.price = Number.isFinite(v) ? v : 0;
+    refreshAmount();
+    onDocChanged();
+  });
+  grid.appendChild(miniField('Unit Price (before tax)', priceIn));
+
+  grid.appendChild(miniField('Amount', amountCell));
+  row.appendChild(grid);
+  return row;
+}
+
+function renderItemsEditor() {
+  const container = $('#itemsEditor');
+  container.textContent = '';
+  doc.items.forEach((item, idx) => container.appendChild(buildItemRow(item, idx)));
+}
+
+function moveItem(idx, dir) {
+  const to = idx + dir;
+  if (to < 0 || to >= doc.items.length) return;
+  const tmp = doc.items[idx];
+  doc.items[idx] = doc.items[to];
+  doc.items[to] = tmp;
+  renderItemsEditor();
+  onDocChanged();
+}
+
+function removeItem(idx) {
+  doc.items.splice(idx, 1);
+  if (doc.items.length === 0) doc.items.push(newItem());
+  renderItemsEditor();
+  onDocChanged();
+}
+
+function addItem() {
+  doc.items.push(newItem());
+  renderItemsEditor();
+  onDocChanged();
+  const rows = $$('#itemsEditor .item-row input[type=text]');
+  if (rows.length) rows[rows.length - 1].focus();
+}
+
+/* ===================== 6. Sheet preview rendering ===================== */
+/* All user input reaches the DOM via textContent only (XSS-safe). */
+
+// Minimum number of table rows; short tables are padded with blank rows for
+// a classic paper look. Fillers are hidden in print so notes never spill to
+// a second page.
+const MIN_TABLE_ROWS = 6;
+
+function addMetaRow(parent, key, value) {
+  const row = el('div', 's-meta-row');
+  row.appendChild(el('span', 'k', key));
+  row.appendChild(el('span', 'v', value));
+  parent.appendChild(row);
+}
+
+function buildItemsTable() {
+  const table = el('table', 'items');
+
+  const thead = document.createElement('thead');
+  const hr = document.createElement('tr');
+  [['No.', 'c-no'], ['Description', ''], ['Qty', 'c-qty'], ['Unit', 'c-unit'],
+   ['Unit Price', 'c-price'], ['Amount', 'c-amt']].forEach(([label, cls]) => {
+    const th = document.createElement('th');
+    if (cls) th.className = cls;
+    th.textContent = label;
+    hr.appendChild(th);
+  });
+  thead.appendChild(hr);
+  table.appendChild(thead);
+
+  const tbody = document.createElement('tbody');
+  doc.items.forEach((item, idx) => {
+    const tr = document.createElement('tr');
+    const qtyC = Math.round((Number(item.qty) || 0) * 100);
+    const cells = [
+      [String(idx + 1), 'c-no'],
+      [item.name, ''],
+      [(qtyC / 100).toLocaleString('en-US', { maximumFractionDigits: 2 }), 'c-qty'],
+      [item.unit, 'c-unit'],
+      [formatMoney(toMinor(item.price, doc.currency), doc.currency), 'c-price'],
+      [formatMoney(lineAmount(item, doc.currency, doc.rounding), doc.currency), 'c-amt'],
+    ];
+    cells.forEach(([text, cls]) => {
+      const td = document.createElement('td');
+      if (cls) td.className = cls;
+      td.textContent = text;
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+  });
+
+  // Pad with blank rows when the table is short (screen only)
+  for (let i = doc.items.length; i < MIN_TABLE_ROWS; i++) {
+    const tr = document.createElement('tr');
+    tr.className = 'filler';
+    for (let c = 0; c < 6; c++) {
+      const td = document.createElement('td');
+      td.className = 'empty';
+      td.textContent = ' ';
+      tr.appendChild(td);
+    }
+    tbody.appendChild(tr);
+  }
+
+  table.appendChild(tbody);
+  return table;
+}
+
+function taxRateLabel() {
+  const r = Number(doc.taxRate) || 0;
+  // Trim trailing zeros: 7.25 -> "7.25", 20 -> "20"
+  return String(Math.round(r * 100) / 100);
+}
+
+function buildSummary(t) {
+  const wrap = el('div', 's-summary');
+
+  /* Left: footnotes */
+  const noteArea = el('div', 's-notearea');
+  if (t.tax !== 0) {
+    const roundLabel = { floor: 'down', round: 'half up', ceil: 'up' }[doc.rounding];
+    noteArea.appendChild(el('div', 's-footnote',
+      `${doc.taxLabel} is calculated once on the subtotal and rounded ${roundLabel}.`));
+  }
+  wrap.appendChild(noteArea);
+
+  /* Right: totals */
+  const totalsBox = el('div', 's-totals');
+  const addRow = (key, value, cls) => {
+    const row = el('div', 'trow' + (cls ? ' ' + cls : ''));
+    row.appendChild(el('span', 'k', key));
+    row.appendChild(el('span', 'v', value));
+    totalsBox.appendChild(row);
+  };
+  if (t.tax !== 0) {
+    addRow('Subtotal', formatMoney(t.subtotal, doc.currency));
+    addRow(`${doc.taxLabel} (${taxRateLabel()}%)`, formatMoney(t.tax, doc.currency));
+  }
+  addRow(DOC_TYPES[doc.type].amountLabel, formatMoney(t.total, doc.currency), 'grand');
+  wrap.appendChild(totalsBox);
+  return wrap;
+}
+
+function buildBox(title, contentFn) {
+  const box = el('div', 's-box');
+  box.appendChild(el('div', 's-box-title', title));
+  contentFn(box);
+  return box;
+}
+
+function renderPreview() {
+  const sheet = $('#sheet');
+  sheet.textContent = '';
+  const t = calcTotals(doc);
+  const type = DOC_TYPES[doc.type];
+
+  /* Top-right meta */
+  const top = el('div', 's-top');
+  top.appendChild(el('div', 's-top-spacer'));
+  const meta = el('div', 's-meta');
+  addMetaRow(meta, 'No.', doc.number || '');
+  addMetaRow(meta, 'Issue Date', doc.issueDate || '');
+  if (type.dueLabel && doc.dueDate) addMetaRow(meta, type.dueLabel, doc.dueDate);
+  top.appendChild(meta);
+  sheet.appendChild(top);
+
+  /* Title */
+  sheet.appendChild(el('div', 's-title', type.label.toUpperCase()));
+
+  /* Bill To + issuer */
+  const parties = el('div', 's-parties');
+
+  const clientBox = el('div', 's-client');
+  clientBox.appendChild(el('div', 's-billto', 'BILL TO'));
+  clientBox.appendChild(el('div', 's-client-name', doc.client.name || ' '));
+  if (doc.client.address) {
+    const addr = el('div', 's-client-addr');
+    appendMultiline(addr, doc.client.address);
+    clientBox.appendChild(addr);
+  }
+  if (type.message) clientBox.appendChild(el('div', 's-message', type.message));
+
+  const amountBox = el('div', 's-amount');
+  amountBox.appendChild(el('span', 'lbl', type.amountLabel));
+  const val = el('span', 'val', formatMoney(t.total, doc.currency));
+  if (t.tax !== 0) {
+    const small = document.createElement('small');
+    small.textContent = `incl. ${doc.taxLabel}`;
+    val.appendChild(small);
+  }
+  amountBox.appendChild(val);
+  clientBox.appendChild(amountBox);
+
+  if (doc.type === 'receipt') {
+    clientBox.appendChild(el('div', 's-message', 'Received the above amount with thanks.'));
+  }
+  parties.appendChild(clientBox);
+
+  const iss = el('div', 's-issuer');
+  if (issuer.logo) {
+    const img = el('img', 's-issuer-logo');
+    img.src = issuer.logo;
+    img.alt = '';
+    iss.appendChild(img);
+  }
+  if (issuer.name) iss.appendChild(el('div', 's-issuer-name', issuer.name));
+  if (issuer.address) {
+    const a = el('div', 's-issuer-line');
+    appendMultiline(a, issuer.address);
+    iss.appendChild(a);
+  }
+  if (issuer.phone) iss.appendChild(el('div', 's-issuer-line', 'Phone: ' + issuer.phone));
+  if (issuer.email) iss.appendChild(el('div', 's-issuer-line', 'Email: ' + issuer.email));
+  if (issuer.taxId) iss.appendChild(el('div', 's-issuer-reg', 'Tax ID: ' + issuer.taxId));
+  parties.appendChild(iss);
+  sheet.appendChild(parties);
+
+  /* Subject */
+  if (doc.subject) {
+    const sj = el('div', 's-subject');
+    sj.appendChild(el('span', 'k', 'Subject'));
+    sj.appendChild(el('span', 'v', doc.subject));
+    sheet.appendChild(sj);
+  }
+
+  /* Items and totals */
+  sheet.appendChild(buildItemsTable());
+  sheet.appendChild(buildSummary(t));
+
+  /* Payment details (invoices only) */
+  if (doc.type === 'invoice' && doc.payment.trim()) {
+    sheet.appendChild(buildBox('Payment Details', (box) => appendMultiline(box, doc.payment)));
+  }
+
+  /* Notes */
+  if (doc.notes) {
+    sheet.appendChild(buildBox('Notes', (box) => appendMultiline(box, doc.notes)));
+  }
+
+  /* Brand credit */
+  sheet.appendChild(el('div', 's-credit', 'Made by Crewless Lab - an AI-operated studio. crewlesslab.github.io'));
+
+  updateItemsSubline(t);
+  fitPreview();
+}
+
+/* Live totals under the line item editor */
+function updateItemsSubline(t) {
+  const line = $('#itemsSubline');
+  line.textContent = '';
+  const addPart = (label, value) => {
+    const span = el('span');
+    span.appendChild(el('span', null, label + ': '));
+    span.appendChild(el('b', null, value));
+    line.appendChild(span);
+  };
+  addPart('Subtotal', formatMoney(t.subtotal, doc.currency));
+  if (t.tax !== 0) addPart(doc.taxLabel, formatMoney(t.tax, doc.currency));
+  addPart('Total', formatMoney(t.total, doc.currency));
+}
+
+/* Scale the preview to the pane width (print CSS restores 1:1) */
+function fitPreview() {
+  const scroll = $('#previewScroll');
+  const scaler = $('#sheetScaler');
+  const sheet = $('#sheet');
+  if (!scroll || !scaler || !sheet) return;
+  const avail = scroll.clientWidth - 44;
+  if (avail <= 0) return;
+  const w = sheet.offsetWidth;
+  const h = sheet.offsetHeight;
+  const scale = Math.min(1, avail / w);
+  scaler.style.transform = scale < 1 ? `scale(${scale})` : 'none';
+  scaler.style.width = Math.round(w * scale) + 'px';
+  scaler.style.height = Math.round(h * scale) + 'px';
+}
+
+/* ==================== 7. Form sync and type switching ==================== */
+
+const APP_TITLE = document.title;
+
+function updateTypeUI() {
+  const type = DOC_TYPES[doc.type];
+  const dueField = $('#dueDateField');
+  if (type.dueLabel) {
+    dueField.hidden = false;
+    $('#dueDateLabel').textContent = type.dueLabel;
+  } else {
+    dueField.hidden = true;
+  }
+}
+
+function setDocType(t) {
+  if (!DOC_TYPES[t]) return;
+  doc.type = t;
+  doc.number = retagNumber(doc.number, t);
+  $('#docNumber').value = doc.number;
+  $$('#docTypeSeg button').forEach((b) => b.classList.toggle('active', b.dataset.type === t));
+  updateTypeUI();
+  onDocChanged();
+}
+
+function populateCurrencySelect() {
+  const sel = $('#currencySel');
+  sel.textContent = '';
+  Object.keys(CURRENCIES).forEach((code) => {
+    const o = document.createElement('option');
+    o.value = code;
+    o.textContent = CURRENCIES[code].name;
+    sel.appendChild(o);
+  });
+}
+
+function syncFormFromState() {
+  $$('#docTypeSeg button').forEach((b) => b.classList.toggle('active', b.dataset.type === doc.type));
+  $('#docNumber').value = doc.number;
+  $('#issueDate').value = doc.issueDate || '';
+  $('#dueDate').value = doc.dueDate || '';
+  $('#subject').value = doc.subject;
+  $('#clientName').value = doc.client.name;
+  $('#clientAddress').value = doc.client.address;
+  $('#currencySel').value = doc.currency;
+  $('#taxLabelSel').value = doc.taxLabel;
+  $('#taxRate').value = doc.taxRate === 0 ? '' : String(doc.taxRate);
+  $('#taxRounding').value = doc.rounding;
+  $('#payment').value = doc.payment;
+  $('#notes').value = doc.notes;
+  updateTypeUI();
+}
+
+/* ---- Issuer ---- */
+
+function updateThumb(imgEl, src) {
+  if (src) {
+    imgEl.src = src;
+    imgEl.classList.add('show');
+  } else {
+    imgEl.removeAttribute('src');
+    imgEl.classList.remove('show');
+  }
+}
+
+function syncIssuerThumbs() {
+  updateThumb($('#logoThumb'), issuer.logo);
+}
+
+function syncIssuerForm() {
+  $('#issuerName').value = issuer.name;
+  $('#issuerAddress').value = issuer.address;
+  $('#issuerPhone').value = issuer.phone;
+  $('#issuerEmail').value = issuer.email;
+  $('#issuerTaxId').value = issuer.taxId;
+  syncIssuerThumbs();
+  // Collapse the card once the issuer has been set up
+  $('#issuerCard').open = !issuer.name;
+}
+
+/* ---- Image upload (resized, stored as a data URL in localStorage) ---- */
+
+function handleImageUpload(file, key, maxDim) {
+  if (!file) return;
+  if (!/^image\//.test(file.type)) {
+    showToast('Please choose an image file.', true);
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = () => {
+    const img = new Image();
+    img.onload = () => {
+      let w = img.width, h = img.height;
+      const scale = Math.min(1, maxDim / Math.max(w, h));
+      w = Math.max(1, Math.round(w * scale));
+      h = Math.max(1, Math.round(h * scale));
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      let url;
+      try { url = canvas.toDataURL('image/png'); } catch (e) { url = String(reader.result); }
+      issuer[key] = url;
+      if (store.set('issuer', issuer)) showToast('Image saved.');
+      syncIssuerThumbs();
+      renderPreview();
+    };
+    img.onerror = () => showToast('Could not load that image.', true);
+    img.src = String(reader.result);
+  };
+  reader.readAsDataURL(file);
+}
+
+/* ======================== 8. Saved clients ======================== */
+
+function refreshClientSelect(selectedName) {
+  const sel = $('#clientSelect');
+  sel.textContent = '';
+  const opt0 = document.createElement('option');
+  opt0.value = '';
+  opt0.textContent = '(Select a client)';
+  sel.appendChild(opt0);
+  clients.forEach((c, i) => {
+    const o = document.createElement('option');
+    o.value = String(i);
+    o.textContent = c.name;
+    sel.appendChild(o);
+  });
+  if (selectedName) {
+    const idx = clients.findIndex((c) => c.name === selectedName);
+    sel.value = idx >= 0 ? String(idx) : '';
+  }
+}
+
+function saveClient() {
+  const name = (doc.client.name || '').trim();
+  if (!name) {
+    showToast('Enter a client name first.', true);
+    return;
+  }
+  const data = { name, address: doc.client.address };
+  const idx = clients.findIndex((c) => c.name === name);
+  const updated = idx >= 0;
+  if (updated) clients[idx] = data; else clients.push(data);
+  clients.sort((a, b) => a.name.localeCompare(b.name, 'en'));
+  store.set('clients', clients);
+  refreshClientSelect(name);
+  showToast(updated ? 'Client updated.' : 'Client saved.');
+}
+
+function deleteClient() {
+  const sel = $('#clientSelect');
+  const idx = Number(sel.value);
+  if (sel.value === '' || !clients[idx]) {
+    showToast('Choose a saved client from the dropdown first.', true);
+    return;
+  }
+  if (!confirm(`Delete saved client "${clients[idx].name}"?`)) return;
+  clients.splice(idx, 1);
+  store.set('clients', clients);
+  refreshClientSelect();
+  showToast('Deleted.');
+}
+
+function onClientSelect() {
+  const raw = $('#clientSelect').value;
+  if (raw === '') return; // Number('') === 0, so bail out first
+  const idx = Number(raw);
+  const c = clients[idx];
+  if (!c) return;
+  doc.client = { name: c.name, address: c.address };
+  $('#clientName').value = c.name;
+  $('#clientAddress').value = c.address;
+  onDocChanged();
+}
+
+/* ============= 9. History (save / list / duplicate / delete) ============= */
+
+function saveDoc() {
+  if (!doc.id) doc.id = 'd' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+  doc.savedAt = new Date().toISOString();
+  const raw = store.get('documents', []);
+  const list = Array.isArray(raw) ? raw : [];
+  const idx = list.findIndex((d) => d.id === doc.id);
+  const copy = deepCopy(doc);
+  if (idx >= 0) list[idx] = copy; else list.unshift(copy);
+  if (store.set('documents', list)) showToast('Saved to History.');
+  scheduleDraft();
+}
+
+function loadDoc(d) {
+  doc = sanitizeDoc(deepCopy(d));
+  refreshClientSelect(doc.client.name);
+  syncFormFromState();
+  renderItemsEditor();
+  onDocChanged();
+  showToast('Document loaded.');
+}
+
+function duplicateDoc(d) {
+  const copy = sanitizeDoc(deepCopy(d));
+  copy.id = null;
+  copy.savedAt = null;
+  copy.number = issueNumber(copy.type);
+  copy.issueDate = todayISO();
+  if (copy.type === 'invoice') copy.dueDate = addDaysISO(copy.issueDate, 30);
+  doc = copy;
+  refreshClientSelect(doc.client.name);
+  syncFormFromState();
+  renderItemsEditor();
+  onDocChanged();
+  showToast('Duplicated. Edit and save when ready.');
+}
+
+function openHistory() {
+  renderHistory();
+  $('#historyModal').classList.add('show');
+}
+
+function closeHistory() {
+  $('#historyModal').classList.remove('show');
+}
+
+function renderHistory() {
+  const listEl = $('#historyList');
+  listEl.textContent = '';
+  const docs = store.get('documents', []);
+  if (!Array.isArray(docs) || docs.length === 0) {
+    listEl.appendChild(el('div', 'modal-empty', 'No saved documents yet. Use "Save" in the header to keep the current document here.'));
+    return;
+  }
+  const sorted = docs.slice().sort((a, b) => String(b.savedAt || '').localeCompare(String(a.savedAt || '')));
+  sorted.forEach((d) => {
+    const sd = sanitizeDoc(deepCopy(d));
+    const t = calcTotals(sd);
+    const row = el('div', 'hist-item');
+
+    const info = el('div', 'hist-info');
+    const line1 = el('div', 'hist-line1');
+    line1.appendChild(el('span', 'hist-type', DOC_TYPES[sd.type].label));
+    line1.appendChild(el('span', null, sd.number || '(no number)'));
+    line1.appendChild(el('span', null, sd.client.name || '(no client)'));
+    info.appendChild(line1);
+    const savedStr = d.savedAt ? new Date(d.savedAt).toLocaleString('en-US') : '';
+    info.appendChild(el('div', 'hist-line2', `${formatMoney(t.total, sd.currency)} / issued ${sd.issueDate} / saved ${savedStr}`));
+    row.appendChild(info);
+
+    const actions = el('div', 'hist-actions');
+    const btnOpen = el('button', 'btn btn-soft btn-sm', 'Open');
+    btnOpen.type = 'button';
+    btnOpen.addEventListener('click', () => { loadDoc(sd); closeHistory(); });
+    const btnDup = el('button', 'btn btn-soft btn-sm', 'Duplicate');
+    btnDup.type = 'button';
+    btnDup.addEventListener('click', () => { duplicateDoc(sd); closeHistory(); });
+    const btnDel = el('button', 'btn btn-danger-soft btn-sm', 'Delete');
+    btnDel.type = 'button';
+    btnDel.addEventListener('click', () => {
+      if (!confirm(`Delete "${sd.number}" from History? This cannot be undone.`)) return;
+      const cur = store.get('documents', []);
+      store.set('documents', (Array.isArray(cur) ? cur : []).filter((x) => x.id !== d.id));
+      renderHistory();
+      showToast('Deleted.');
+    });
+    actions.appendChild(btnOpen);
+    actions.appendChild(btnDup);
+    actions.appendChild(btnDel);
+    row.appendChild(actions);
+    listEl.appendChild(row);
+  });
+}
+
+/* =============== 10. Backup (export / import) =============== */
+
+function exportData() {
+  const payload = {
+    app: 'inven',
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    data: {
+      issuer,
+      clients,
+      documents: store.get('documents', []),
+      seq: store.get('seq', null),
+      paymentDefault: store.get('paymentDefault', null),
+      draft: doc,
+    },
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `invoice-generator-backup-${todayCompact()}.json`;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 0);
+  showToast('Backup (JSON) downloaded.');
+}
+
+function importData(file) {
+  const reader = new FileReader();
+  reader.onload = () => {
+    let payload;
+    try { payload = JSON.parse(String(reader.result)); } catch (e) {
+      showToast('Could not read that JSON file.', true);
+      return;
+    }
+    if (!payload || payload.app !== 'inven' || !payload.data) {
+      showToast('That is not a backup file from this app.', true);
+      return;
+    }
+    if (!confirm('Import this backup? Your current business details, clients and history will be overwritten.')) return;
+    const d = payload.data;
+    if (d.issuer) store.set('issuer', d.issuer);
+    if (Array.isArray(d.clients)) store.set('clients', d.clients);
+    if (Array.isArray(d.documents)) store.set('documents', d.documents);
+    if (d.seq) store.set('seq', d.seq);
+    if (d.paymentDefault) store.set('paymentDefault', d.paymentDefault);
+    if (d.draft) store.set('draft', d.draft);
+    issuer = Object.assign(defaultIssuer(), store.get('issuer', {}));
+    clients = store.get('clients', []);
+    if (!Array.isArray(clients)) clients = [];
+    doc = sanitizeDoc(store.get('draft', null));
+    refreshClientSelect(doc.client.name);
+    syncIssuerForm();
+    syncFormFromState();
+    renderItemsEditor();
+    renderPreview();
+    showToast('Backup imported.');
+  };
+  reader.readAsText(file);
+}
+
+/* ==================== 11. View switching (narrow screens) ==================== */
+
+function setView(view) {
+  const app = $('#app');
+  app.classList.toggle('view-form', view === 'form');
+  app.classList.toggle('view-preview', view === 'preview');
+  $('#tabForm').classList.toggle('active', view === 'form');
+  $('#tabPreview').classList.toggle('active', view === 'preview');
+  if (view === 'preview') fitPreview();
+}
+
+/* ==================== 12. Event binding and init ==================== */
+
+function bindEvents() {
+  /* Header actions */
+  $('#btnNew').addEventListener('click', () => {
+    if (!confirm('Start a new document? Unsaved changes to the current one will be discarded.')) return;
+    doc = newDoc();
+    refreshClientSelect('');
+    syncFormFromState();
+    renderItemsEditor();
+    onDocChanged();
+    showToast('New document created.');
+  });
+  $('#btnSave').addEventListener('click', saveDoc);
+  $('#btnHistory').addEventListener('click', openHistory);
+  $('#btnHistoryClose').addEventListener('click', closeHistory);
+  $('#historyModal').addEventListener('click', (e) => {
+    if (e.target === e.currentTarget) closeHistory();
+  });
+  $('#btnExport').addEventListener('click', exportData);
+  $('#btnImport').addEventListener('click', () => $('#importFile').click());
+  $('#importFile').addEventListener('change', (e) => {
+    const f = e.target.files[0];
+    if (f) importData(f);
+    e.target.value = '';
+  });
+  $('#btnPrint').addEventListener('click', () => window.print());
+  $('#btnPrint2').addEventListener('click', () => window.print());
+
+  /* Tabs */
+  $('#tabForm').addEventListener('click', () => setView('form'));
+  $('#tabPreview').addEventListener('click', () => setView('preview'));
+
+  /* Document type */
+  $('#docTypeSeg').addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-type]');
+    if (btn) setDocType(btn.dataset.type);
+  });
+
+  /* Basics */
+  $('#docNumber').addEventListener('input', (e) => { doc.number = e.target.value; onDocChanged(); });
+  $('#btnRenumber').addEventListener('click', () => {
+    doc.number = issueNumber(doc.type);
+    $('#docNumber').value = doc.number;
+    onDocChanged();
+  });
+  $('#issueDate').addEventListener('change', (e) => { doc.issueDate = e.target.value; onDocChanged(); });
+  $('#dueDate').addEventListener('change', (e) => { doc.dueDate = e.target.value; onDocChanged(); });
+  $('#subject').addEventListener('input', (e) => { doc.subject = e.target.value; onDocChanged(); });
+
+  /* Bill To */
+  $('#clientSelect').addEventListener('change', onClientSelect);
+  $('#btnClientSave').addEventListener('click', saveClient);
+  $('#btnClientDelete').addEventListener('click', deleteClient);
+  $('#clientName').addEventListener('input', (e) => { doc.client.name = e.target.value; onDocChanged(); });
+  $('#clientAddress').addEventListener('input', (e) => { doc.client.address = e.target.value; onDocChanged(); });
+
+  /* Line items */
+  $('#btnAddItem').addEventListener('click', addItem);
+
+  /* Currency and tax */
+  $('#currencySel').addEventListener('change', (e) => {
+    doc.currency = CURRENCIES[e.target.value] ? e.target.value : 'USD';
+    renderItemsEditor(); // line amounts follow the new symbol/decimals
+    onDocChanged();
+  });
+  $('#taxLabelSel').addEventListener('change', (e) => {
+    doc.taxLabel = TAX_LABELS.includes(e.target.value) ? e.target.value : 'Tax';
+    onDocChanged();
+  });
+  $('#taxRate').addEventListener('input', (e) => {
+    const v = Number(e.target.value);
+    doc.taxRate = Number.isFinite(v) ? Math.min(100, Math.max(0, v)) : 0;
+    onDocChanged();
+  });
+  $('#taxRounding').addEventListener('change', (e) => {
+    doc.rounding = e.target.value;
+    renderItemsEditor(); // line amounts follow the rounding mode
+    onDocChanged();
+  });
+
+  /* Payment details (also saved as the default for future documents) */
+  $('#payment').addEventListener('input', (e) => {
+    doc.payment = e.target.value;
+    store.set('paymentDefault', doc.payment);
+    onDocChanged();
+  });
+
+  /* Notes */
+  $('#notes').addEventListener('input', (e) => { doc.notes = e.target.value; onDocChanged(); });
+
+  /* Issuer (autosaved) */
+  const bindIssuer = (id, key) => {
+    $(id).addEventListener('input', (e) => {
+      issuer[key] = e.target.value;
+      scheduleIssuerSave();
+      renderPreview();
+    });
+  };
+  bindIssuer('#issuerName', 'name');
+  bindIssuer('#issuerAddress', 'address');
+  bindIssuer('#issuerPhone', 'phone');
+  bindIssuer('#issuerEmail', 'email');
+  bindIssuer('#issuerTaxId', 'taxId');
+  $('#logoInput').addEventListener('change', (e) => {
+    handleImageUpload(e.target.files[0], 'logo', 600);
+    e.target.value = '';
+  });
+  $('#btnLogoRemove').addEventListener('click', () => {
+    issuer.logo = '';
+    store.set('issuer', issuer);
+    syncIssuerThumbs();
+    renderPreview();
+  });
+
+  /* Keyboard shortcuts */
+  document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
+      e.preventDefault();
+      saveDoc();
+    }
+    if (e.key === 'Escape') closeHistory();
+  });
+
+  /* While printing, set the title so "Save as PDF" suggests a useful filename */
+  window.addEventListener('beforeprint', () => {
+    const label = DOC_TYPES[doc.type].label.replace(/\s+/g, '-');
+    const client = (doc.client.name || '').replace(/[\\/:*?"<>|]/g, '').slice(0, 30);
+    document.title = [label, doc.number, client].filter(Boolean).join('_');
+  });
+  window.addEventListener('afterprint', () => { document.title = APP_TITLE; });
+
+  window.addEventListener('resize', fitPreview);
+}
+
+function init() {
+  populateCurrencySelect();
+  bindEvents();
+  refreshClientSelect(doc.client.name);
+  syncIssuerForm();
+  syncFormFromState();
+  renderItemsEditor();
+  renderPreview();
+  if (!rawStorage.persistent) {
+    showToast('This browser cannot store data persistently (private browsing?). Use Export to back up your work.', true);
+  }
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
+</script>
+</body>
+</html>
