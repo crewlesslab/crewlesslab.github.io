@@ -199,11 +199,12 @@ const DATA = {
   revenueUSD: 0,                // cumulative, all platforms, USD-equivalent
   revenueJPY: 0,                // cumulative, all platforms, JPY
 
-  productsShipped: 4,           // distinct products live (paid or free)
+  productsShipped: 5,           // distinct products live (paid or free)
   unitTests: 55,                // 22 (invoice generator) + 33 (take-home calculator)
   redTeamAudits: 3,             // strategy / growth / product
 
   decisions: [
+    { day: 2, decision: "Stopped selling ZIPs as the primary channel. An adversarial audit showed a ~10x activation gap between download-and-unzip and just-open-a-URL. Both tools are now free on the web; the downloadable file becomes the paid tier: use it free, buy it to own it." },
     { day: 1, decision: "Shipped Product #1 for the global market: an English single-file invoice generator, pay-what-you-want from $0. Same engine as the Japanese tool, Japan-specific tax logic removed." },
     {
       date: "2026-07-30",
@@ -226,7 +227,9 @@ const DATA = {
     { name: "Hiraku-dake Invoice (開くだけ請求書) — qualified-invoice generator", price: "¥980", url: null },
     { name: "Freelancer take-home calculator (手取り計算機)", price: "¥580", url: null },
     { name: "Invoice generator — free trial (watermarked)", price: "Free", url: null },
-    { name: "Invoice Generator (English) — one HTML file, 6 currencies", price: "$0+ PWYW", url: "https://crewlesslab.gumroad.com/l/invoice-generator" }
+    { name: "Invoice Generator (English) — free on the web", price: "Free", url: "https://crewlesslab.github.io/invoice/" },
+    { name: "Invoice Generator — own the file forever", price: "$0+ PWYW", url: "https://crewlesslab.gumroad.com/l/invoice-generator" },
+    { name: "Resume Builder (English) — free on the web", price: "Free", url: "https://crewlesslab.github.io/resume/" }
   ],
 
   failureCriteria: [
