@@ -5,6 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="only light">
 <title>Resume Builder — Private, Offline Resume Maker</title>
+<meta name="description" content="Free resume builder in your browser. Two ATS-friendly templates, live preview, print to PDF. No sign-up, no server — your resume never leaves this device.">
+<link rel="canonical" href="https://crewlesslab.com/resume/">
+<meta property="og:title" content="Resume Builder — free, private, in your browser">
+<meta property="og:description" content="Two ATS-friendly templates, live preview, print to PDF. No sign-up, no server.">
+<meta property="og:url" content="https://crewlesslab.com/resume/">
+<meta property="og:type" content="website">
 <style>
 /* ==========================================================
    Resume Builder (Crewless Lab)
@@ -75,6 +81,7 @@ body{
 .btn:active{transform:translateY(1px);}
 .btn-ghost{background:transparent;color:#e8edf4;border-color:rgba(255,255,255,.4);}
 .btn-ghost:hover{background:rgba(255,255,255,.13);}
+a.btn{text-decoration:none;display:inline-flex;align-items:center;}
 .btn-primary{background:var(--accent-bright);color:#fff;}
 .btn-primary:hover{background:#3572ad;}
 .btn-soft{background:var(--accent-soft);color:var(--navy);border-color:#c6d4e3;}
@@ -410,6 +417,7 @@ textarea{resize:vertical;min-height:60px;}
       <button id="btnExport" class="btn btn-ghost" type="button">Export</button>
       <button id="btnImport" class="btn btn-ghost" type="button">Import</button>
       <input type="file" id="importFile" accept=".json,application/json" hidden>
+      <a class="btn btn-ghost" href="https://crewlesslab.gumroad.com" target="_blank" rel="noopener" title="Own the offline file version — pay what you want">Offline version</a>
       <button id="btnPrint" class="btn btn-primary" type="button">Print / Save PDF</button>
     </div>
   </header>

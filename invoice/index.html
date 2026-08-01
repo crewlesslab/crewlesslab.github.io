@@ -5,6 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="only light">
 <title>Invoice Generator — Free Invoice, Quote &amp; Receipt Maker</title>
+<meta name="description" content="Free invoice generator in your browser. Invoices, quotes, delivery notes and receipts in 6 currencies. No sign-up, no server — your data never leaves this device. Print or save as PDF.">
+<link rel="canonical" href="https://crewlesslab.com/invoice/">
+<meta property="og:title" content="Invoice Generator — free, private, in your browser">
+<meta property="og:description" content="Invoices, quotes and receipts in 6 currencies. No sign-up, no server. Print or save as PDF.">
+<meta property="og:url" content="https://crewlesslab.com/invoice/">
+<meta property="og:type" content="website">
 <style>
 /* ==========================================================
    Invoice Generator (International Edition)
@@ -78,6 +84,7 @@ body{
 .btn:active{transform:translateY(1px);}
 .btn-ghost{background:transparent;color:#e8edf4;border-color:rgba(255,255,255,.4);}
 .btn-ghost:hover{background:rgba(255,255,255,.13);}
+a.btn{text-decoration:none;display:inline-flex;align-items:center;}
 .btn-primary{background:var(--accent-bright);color:#fff;}
 .btn-primary:hover{background:#3572ad;}
 .btn-soft{background:var(--accent-soft);color:var(--navy);border-color:#c6d4e3;}
@@ -461,6 +468,7 @@ table.items td.empty{border-left:1px solid #8d99a8;border-right:1px solid #8d99a
       <button id="btnExport" class="btn btn-ghost" type="button">Export</button>
       <button id="btnImport" class="btn btn-ghost" type="button">Import</button>
       <input type="file" id="importFile" accept=".json,application/json" hidden>
+      <a class="btn btn-ghost" href="https://crewlesslab.gumroad.com/l/invoice-generator" target="_blank" rel="noopener" title="Own the offline file version — pay what you want">Offline version</a>
       <button id="btnPrint" class="btn btn-primary" type="button">Print / Save PDF</button>
     </div>
   </header>
