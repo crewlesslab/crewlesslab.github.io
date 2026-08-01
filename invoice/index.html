@@ -11,6 +11,82 @@
 <meta property="og:description" content="Invoices, quotes and receipts in 6 currencies. No sign-up, no server. Print or save as PDF.">
 <meta property="og:url" content="https://crewlesslab.com/invoice/">
 <meta property="og:type" content="website">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Invoice Generator",
+  "description": "Free invoice generator in your browser. Invoices, quotes, delivery notes and receipts in 6 currencies. No sign-up, no server — your data never leaves this device. Print or save as PDF.",
+  "url": "https://crewlesslab.com/invoice/",
+  "applicationCategory": "BusinessApplication",
+  "operatingSystem": "Any",
+  "author": {
+    "@type": "Organization",
+    "name": "Crewless Lab"
+  },
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Is the Invoice Generator really free?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Invoices, quotes, delivery notes and receipts, six currencies, saved clients, history and JSON backup — everything on this page is free, with no sign-up, no watermark and no hidden limits."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Where is my data stored?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Only in this browser on this device, using localStorage. Nothing is ever uploaded — there is no server and no account. Use Export to download a JSON backup and Import to restore it on another device."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I use it offline?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Once the page has loaded it keeps working without a connection, because everything runs inside your browser. If you want a copy that lives on your own computer, see the paid version below."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How do I save an invoice as a PDF?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Click Print / Save PDF and choose \"Save as PDF\" as the destination in your browser's print dialog. Documents are designed to fit a single page on both A4 and US Letter."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Which currencies and taxes are supported?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "USD, EUR, GBP, JPY, AUD and CAD, with one tax rate per document labelled Tax, VAT or GST and a choice of three rounding modes. Set the rate to 0 to hide the tax line."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What's the paid version?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "This web version stays free. If you would like to own the generator as a single offline HTML file that you keep forever, it is available pay-what-you-want at crewlesslab.gumroad.com/l/invoice-generator."
+      }
+    }
+  ]
+}
+</script>
 <style>
 /* ==========================================================
    Invoice Generator (International Edition)
@@ -447,6 +523,23 @@ table.items td.empty{border-left:1px solid #8d99a8;border-right:1px solid #8d99a
   }
   .modal-backdrop,.toast{display:none !important;}
 }
+
+/* ==========================================================
+   SEO content layer - FAQ shown below the app (screen only).
+   The app keeps its 100vh layout; scrolling the page reveals
+   this section. Hidden entirely in print.
+   ========================================================== */
+.seo-faq{max-width:780px;margin:0 auto;padding:34px 20px 48px;}
+.seo-faq h2{font-size:17px;font-weight:700;color:var(--navy);margin:0 0 12px;letter-spacing:.02em;}
+.seo-faq-item{
+  background:var(--card);border:1px solid var(--border);border-radius:9px;
+  padding:12px 14px;margin-bottom:8px;
+  box-shadow:0 1px 2px rgba(30,50,80,.05);
+}
+.seo-faq-item h3{font-size:13.5px;font-weight:700;color:var(--navy);margin:0 0 4px;}
+.seo-faq-item p{margin:0;font-size:13px;color:var(--text);line-height:1.7;}
+.seo-faq-item a{color:var(--accent);}
+@media print{.seo-faq{display:none !important;}}
 </style>
 </head>
 <body>
@@ -680,6 +773,35 @@ table.items td.empty{border-left:1px solid #8d99a8;border-right:1px solid #8d99a
     </section>
   </main>
 </div>
+
+<!-- ============ SEO content layer: FAQ (screen only) ============ -->
+<section class="seo-faq" aria-labelledby="faqHeading">
+  <h2 id="faqHeading">FAQ</h2>
+  <div class="seo-faq-item">
+    <h3>Is the Invoice Generator really free?</h3>
+    <p>Yes. Invoices, quotes, delivery notes and receipts, six currencies, saved clients, history and JSON backup — everything on this page is free, with no sign-up, no watermark and no hidden limits.</p>
+  </div>
+  <div class="seo-faq-item">
+    <h3>Where is my data stored?</h3>
+    <p>Only in this browser on this device, using localStorage. Nothing is ever uploaded — there is no server and no account. Use Export to download a JSON backup and Import to restore it on another device.</p>
+  </div>
+  <div class="seo-faq-item">
+    <h3>Can I use it offline?</h3>
+    <p>Yes. Once the page has loaded it keeps working without a connection, because everything runs inside your browser. If you want a copy that lives on your own computer, see the paid version below.</p>
+  </div>
+  <div class="seo-faq-item">
+    <h3>How do I save an invoice as a PDF?</h3>
+    <p>Click Print / Save PDF and choose "Save as PDF" as the destination in your browser's print dialog. Documents are designed to fit a single page on both A4 and US Letter.</p>
+  </div>
+  <div class="seo-faq-item">
+    <h3>Which currencies and taxes are supported?</h3>
+    <p>USD, EUR, GBP, JPY, AUD and CAD, with one tax rate per document labelled Tax, VAT or GST and a choice of three rounding modes. Set the rate to 0 to hide the tax line.</p>
+  </div>
+  <div class="seo-faq-item">
+    <h3>What's the paid version?</h3>
+    <p>This web version stays free. If you would like to own the generator as a single offline HTML file that you keep forever, it is available pay-what-you-want at <a href="https://crewlesslab.gumroad.com/l/invoice-generator" target="_blank" rel="noopener">crewlesslab.gumroad.com/l/invoice-generator</a>.</p>
+  </div>
+</section>
 
 <!-- History modal -->
 <div class="modal-backdrop" id="historyModal">

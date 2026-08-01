@@ -11,6 +11,82 @@
 <meta property="og:description" content="Two ATS-friendly templates, live preview, print to PDF. No sign-up, no server.">
 <meta property="og:url" content="https://crewlesslab.com/resume/">
 <meta property="og:type" content="website">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Resume Builder",
+  "description": "Free resume builder in your browser. Two ATS-friendly templates, live preview, print to PDF. No sign-up, no server — your resume never leaves this device.",
+  "url": "https://crewlesslab.com/resume/",
+  "applicationCategory": "BusinessApplication",
+  "operatingSystem": "Any",
+  "author": {
+    "@type": "Organization",
+    "name": "Crewless Lab"
+  },
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Is the Resume Builder really free?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Both templates, unlimited saved versions, JSON backup and PDF printing — everything on this page is free, with no sign-up, no watermark and no hidden limits."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Where is my resume data stored?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Only in this browser on this device, using localStorage. Nothing is ever uploaded — there is no server and no account. Use Export to download a JSON backup and Import to restore it on another device."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I use it offline?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Once the page has loaded it keeps working without a connection, because everything runs inside your browser. If you want a copy that lives on your own computer, see the paid version below."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is the resume ATS-friendly?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Both templates render as a plain top-to-bottom text flow without tables or graphics, and the Compact template prints as a single linear column, so applicant tracking systems can parse the exported PDF cleanly."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How do I save my resume as a PDF?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Click Print / Save PDF and choose \"Save as PDF\" as the destination in your browser's print dialog. The resume fits A4 and US Letter in one to two pages."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What's the paid version?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "This web version stays free. If you would like to own the builder as an offline HTML file that you keep forever, it is available pay-what-you-want at crewlesslab.gumroad.com."
+      }
+    }
+  ]
+}
+</script>
 <style>
 /* ==========================================================
    Resume Builder (Crewless Lab)
@@ -396,6 +472,23 @@ textarea{resize:vertical;min-height:60px;}
   .tpl-compact .col-side .certs{list-style:disc;padding-left:4.5mm;}
   .modal-backdrop,.toast{display:none !important;}
 }
+
+/* ==========================================================
+   SEO content layer - FAQ shown below the app (screen only).
+   The app keeps its 100vh layout; scrolling the page reveals
+   this section. Hidden entirely in print.
+   ========================================================== */
+.seo-faq{max-width:780px;margin:0 auto;padding:34px 20px 48px;}
+.seo-faq h2{font-size:17px;font-weight:700;color:var(--navy);margin:0 0 12px;letter-spacing:.02em;}
+.seo-faq-item{
+  background:var(--card);border:1px solid var(--border);border-radius:9px;
+  padding:12px 14px;margin-bottom:8px;
+  box-shadow:0 1px 2px rgba(30,50,80,.05);
+}
+.seo-faq-item h3{font-size:13.5px;font-weight:700;color:var(--navy);margin:0 0 4px;}
+.seo-faq-item p{margin:0;font-size:13px;color:var(--text);line-height:1.7;}
+.seo-faq-item a{color:var(--accent);}
+@media print{.seo-faq{display:none !important;}}
 </style>
 </head>
 <body>
@@ -582,6 +675,35 @@ textarea{resize:vertical;min-height:60px;}
     </section>
   </main>
 </div>
+
+<!-- ============ SEO content layer: FAQ (screen only) ============ -->
+<section class="seo-faq" aria-labelledby="faqHeading">
+  <h2 id="faqHeading">FAQ</h2>
+  <div class="seo-faq-item">
+    <h3>Is the Resume Builder really free?</h3>
+    <p>Yes. Both templates, unlimited saved versions, JSON backup and PDF printing — everything on this page is free, with no sign-up, no watermark and no hidden limits.</p>
+  </div>
+  <div class="seo-faq-item">
+    <h3>Where is my resume data stored?</h3>
+    <p>Only in this browser on this device, using localStorage. Nothing is ever uploaded — there is no server and no account. Use Export to download a JSON backup and Import to restore it on another device.</p>
+  </div>
+  <div class="seo-faq-item">
+    <h3>Can I use it offline?</h3>
+    <p>Yes. Once the page has loaded it keeps working without a connection, because everything runs inside your browser. If you want a copy that lives on your own computer, see the paid version below.</p>
+  </div>
+  <div class="seo-faq-item">
+    <h3>Is the resume ATS-friendly?</h3>
+    <p>Yes. Both templates render as a plain top-to-bottom text flow without tables or graphics, and the Compact template prints as a single linear column, so applicant tracking systems can parse the exported PDF cleanly.</p>
+  </div>
+  <div class="seo-faq-item">
+    <h3>How do I save my resume as a PDF?</h3>
+    <p>Click Print / Save PDF and choose "Save as PDF" as the destination in your browser's print dialog. The resume fits A4 and US Letter in one to two pages.</p>
+  </div>
+  <div class="seo-faq-item">
+    <h3>What's the paid version?</h3>
+    <p>This web version stays free. If you would like to own the builder as an offline HTML file that you keep forever, it is available pay-what-you-want at <a href="https://crewlesslab.gumroad.com" target="_blank" rel="noopener">crewlesslab.gumroad.com</a>.</p>
+  </div>
+</section>
 
 <!-- Versions modal -->
 <div class="modal-backdrop" id="versionsModal">
