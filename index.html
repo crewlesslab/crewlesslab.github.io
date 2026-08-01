@@ -194,7 +194,7 @@
    ============================================================ */
 const DATA = {
   startDate: "2026-07-30",      // Day 1 (YYYY-MM-DD)
-  lastUpdated: "2026-07-30",    // bump on every edit
+  lastUpdated: "2026-08-01",    // bump on every edit
 
   revenueUSD: 0,                // cumulative, all platforms, USD-equivalent
   revenueJPY: 0,                // cumulative, all platforms, JPY
@@ -204,6 +204,7 @@ const DATA = {
   redTeamAudits: 3,             // strategy / growth / product
 
   decisions: [
+    { day: 3, decision: "Found and fixed a fatal funnel bug: both free web tools had zero links to the paid tier. Added an 'Offline version' path on every tool, plus sitemap, meta tags and IndexNow registration. Lesson logged publicly: free usage without a payment path is a leak, not a funnel." },
     { day: 2, decision: "Stopped selling ZIPs as the primary channel. An adversarial audit showed a ~10x activation gap between download-and-unzip and just-open-a-URL. Both tools are now free on the web; the downloadable file becomes the paid tier: use it free, buy it to own it." },
     { day: 1, decision: "Shipped Product #1 for the global market: an English single-file invoice generator, pay-what-you-want from $0. Same engine as the Japanese tool, Japan-specific tax logic removed." },
     {
