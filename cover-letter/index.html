@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="only light">
+<title>Cover Letter Builder — Free, Private, in Your Browser</title>
+<meta name="description" content="Free cover letter builder in your browser. Two professional templates, live preview, print to PDF. No sign-up, no server — your letter never leaves this device.">
+<link rel="canonical" href="https://crewlesslab.com/cover-letter/">
+<meta property="og:title" content="Cover Letter Builder — free, private, in your browser">
+<meta property="og:description" content="Two professional templates, live preview, print to PDF. No sign-up, no server.">
+<meta property="og:url" content="https://crewlesslab.com/cover-letter/">
+<meta property="og:type" content="website">
+<style>
+/* ==========================================================
+   Cover Letter Builder (Crewless Lab)
+   Single HTML file / no external dependencies / your letter
+   data stays in localStorage on this device only.
+   ========================================================== */
+
+:root{
+  --navy:#1e3a5f;
+  --navy-deep:#152a46;
+  --accent:#2f5d8f;
+  --accent-bright:#3f83c9;
+  --accent-soft:#e9eff6;
+  --bg:#f2f4f8;
+  --card:#ffffff;
+  --border:#d8dee7;
+  --border-strong:#b6c0cd;
+  --text:#243140;
+  --muted:#67748a;
+  --danger:#b3372f;
+}
+
+*{box-sizing:border-box;}
+[hidden]{display:none !important;}
+
+html,body{height:100%;}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Helvetica Neue",Arial,sans-serif;
+  font-size:14px;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ---------- App layout ---------- */
+.app{display:flex;flex-direction:column;height:100vh;}
+.app-main{flex:1;display:flex;min-height:0;}
+
+/* ---------- Header ---------- */
+.app-header{
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  padding:10px 16px;
+  background:var(--navy-deep);
+  color:#fff;
+  box-shadow:0 1px 4px rgba(10,20,40,.25);
+  z-index:10;
+}
+.app-brand{display:flex;align-items:center;gap:10px;margin-right:auto;}
+.app-logo{
+  width:30px;height:30px;border-radius:7px;flex:none;
+  background:#fff;color:var(--navy-deep);
+  display:flex;align-items:center;justify-content:center;
+  font-weight:800;font-size:14px;letter-spacing:-.02em;
+}
+.app-header h1{font-size:15px;font-weight:700;margin:0;letter-spacing:.02em;}
+.app-header .sub{font-size:11px;color:#9fb2ca;font-weight:500;}
+.app-actions{display:flex;gap:6px;flex-wrap:wrap;align-items:center;}
+
+/* ---------- Buttons ---------- */
+.btn{
+  border:1px solid transparent;border-radius:7px;
+  padding:7px 13px;font:inherit;font-size:13px;font-weight:600;
+  cursor:pointer;white-space:nowrap;
+  transition:background .15s,border-color .15s,color .15s;
+}
+.btn:active{transform:translateY(1px);}
+.btn-ghost{background:transparent;color:#e8edf4;border-color:rgba(255,255,255,.4);}
+.btn-ghost:hover{background:rgba(255,255,255,.13);}
+a.btn{text-decoration:none;display:inline-flex;align-items:center;}
+.btn-primary{background:var(--accent-bright);color:#fff;}
+.btn-primary:hover{background:#3572ad;}
+.btn-soft{background:var(--accent-soft);color:var(--navy);border-color:#c6d4e3;}
+.btn-soft:hover{background:#dbe6f1;}
+.btn-danger-soft{background:#fbeeed;color:var(--danger);border-color:#e6c3bf;}
+.btn-danger-soft:hover{background:#f6dedb;}
+.btn-sm{padding:4px 10px;font-size:12px;border-radius:6px;}
+
+/* ---------- Segmented control (template switch) ---------- */
+.segmented{display:flex;gap:0;border:1px solid var(--border-strong);border-radius:8px;overflow:hidden;}
+.segmented button{
+  flex:1;padding:6px 14px;border:none;background:#fff;color:var(--muted);
+  font:inherit;font-size:12.5px;font-weight:600;cursor:pointer;
+  border-right:1px solid var(--border);
+  transition:background .15s,color .15s;
+}
+.segmented button:last-child{border-right:none;}
+.segmented button:hover{background:var(--accent-soft);color:var(--navy);}
+.segmented button.active{background:var(--navy);color:#fff;}
+
+/* ---------- Tabs (narrow screens) ---------- */
+.pane-tabs{display:none;background:var(--navy-deep);padding:0 12px 10px;gap:8px;}
+.pane-tabs .tab{
+  flex:1;padding:8px;border-radius:7px;border:1px solid rgba(255,255,255,.35);
+  background:transparent;color:#dbe4ef;font:inherit;font-size:13px;font-weight:600;cursor:pointer;
+}
+.pane-tabs .tab.active{background:#fff;color:var(--navy-deep);border-color:#fff;}
+
+/* ---------- Form pane ---------- */
+.form-pane{
+  width:47%;min-width:400px;max-width:600px;
+  overflow-y:auto;
+  padding:16px 16px 60px;
+  background:var(--bg);
+  border-right:1px solid var(--border);
+}
+
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:9px;
+  margin-bottom:14px;
+  box-shadow:0 1px 2px rgba(30,50,80,.05);
+}
+.card-head{
+  padding:10px 14px;
+  font-weight:700;font-size:13px;color:var(--navy);
+  border-bottom:1px solid var(--border);
+  display:flex;justify-content:space-between;align-items:center;gap:8px;
+}
+.card-body{padding:12px 14px;display:flex;flex-direction:column;gap:10px;}
+
+/* ---------- Form controls ---------- */
+.f-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.f-field{display:flex;flex-direction:column;gap:4px;min-width:0;}
+.f-field.span2{grid-column:span 2;}
+.f-field>label{font-size:11.5px;font-weight:600;color:var(--muted);}
+
+input[type=text],input[type=email],input[type=tel],input[type=date],select,textarea{
+  border:1px solid var(--border-strong);
+  border-radius:6px;
+  padding:7px 9px;
+  font:inherit;font-size:13.5px;
+  background:#fff;color:var(--text);
+  width:100%;
+}
+input:focus,select:focus,textarea:focus{
+  outline:2px solid var(--accent-bright);outline-offset:-1px;border-color:var(--accent-bright);
+}
+textarea{resize:vertical;min-height:60px;}
+
+.hint{font-size:11.5px;color:var(--muted);line-height:1.5;}
+
+/* ---------- Preview pane ---------- */
+.preview-pane{
+  flex:1;overflow:auto;
+  background:#d9dfe9;
+  display:flex;flex-direction:column;
+}
+.preview-toolbar{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  padding:9px 16px;
+  background:#e8ecf2;border-bottom:1px solid var(--border);
+  font-size:12px;color:var(--muted);
+  position:sticky;top:0;z-index:5;
+}
+.preview-toolbar b{color:var(--navy);font-size:12.5px;}
+.preview-scroll{flex:1;padding:22px;}
+.sheet-scaler{transform-origin:top left;margin:0 auto;}
+
+/* ==========================================================
+   Letter sheet - shared by screen and print.
+   The screen shows a 210mm-wide page. Content is a plain
+   top-to-bottom text flow so the exported PDF parses cleanly.
+   ========================================================== */
+.sheet{
+  position:relative;
+  width:210mm;min-height:270mm;
+  background:#fff;color:#1d2733;
+  padding:20mm 20mm;
+  font-size:10.5pt;line-height:1.6;
+  box-shadow:0 3px 16px rgba(20,35,60,.22);
+  -webkit-print-color-adjust:exact;print-color-adjust:exact;
+}
+
+/* ----- Shared letter pieces ----- */
+.cl-date{margin:9mm 0 7mm;}
+.cl-recipient{margin-bottom:7mm;}
+.cl-salutation{margin-bottom:4.5mm;}
+.cl-p{margin:0 0 4mm;}
+.cl-p:last-child{margin-bottom:0;}
+.cl-sig{margin-top:7mm;}
+.cl-signame{margin-top:9mm;font-weight:700;}
+.cl-placeholder{color:#8d99a8;font-style:italic;}
+
+/* ----- Template: Classic (traditional business letter, serif) ----- */
+.tpl-classic{font-family:Georgia,"Times New Roman",serif;font-size:11pt;line-height:1.55;}
+.tpl-classic .cl-sender{text-align:right;}
+.tpl-classic .cl-sender-name{font-weight:700;font-size:12.5pt;}
+.tpl-classic .cl-sender-line{font-size:9.5pt;color:#39434f;}
+
+/* ----- Template: Modern (minimal, sans-serif) ----- */
+.tpl-modern .cl-m-head{border-bottom:2px solid var(--navy);padding-bottom:4mm;margin-bottom:7mm;}
+.tpl-modern .cl-m-name{font-size:19pt;font-weight:700;color:var(--navy);line-height:1.2;}
+.tpl-modern .cl-m-contact{font-size:9pt;color:#39434f;margin-top:1.6mm;}
+.tpl-modern .cl-dot{color:#8d99a8;margin:0 1.6mm;}
+.tpl-modern .cl-date{margin:0 0 6mm;color:#5a6675;font-size:9.5pt;}
+.tpl-modern .cl-recipient{font-size:9.5pt;color:#39434f;margin-bottom:6mm;}
+.tpl-modern .cl-salutation{font-weight:600;}
+
+/* ---------- Modal ---------- */
+.modal-backdrop{
+  position:fixed;inset:0;background:rgba(15,25,40,.55);
+  display:none;align-items:center;justify-content:center;z-index:50;padding:20px;
+}
+.modal-backdrop.show{display:flex;}
+.modal{
+  background:#fff;border-radius:11px;
+  width:min(760px,100%);max-height:82vh;
+  display:flex;flex-direction:column;overflow:hidden;
+  box-shadow:0 10px 40px rgba(10,20,40,.35);
+}
+.modal-head{
+  padding:13px 18px;border-bottom:1px solid var(--border);
+  display:flex;justify-content:space-between;align-items:center;
+  font-weight:700;color:var(--navy);
+}
+.modal-body{overflow-y:auto;padding:6px 0;}
+.hist-item{
+  display:flex;justify-content:space-between;gap:10px;align-items:center;
+  padding:10px 18px;border-bottom:1px solid var(--border);
+}
+.hist-item:last-child{border-bottom:none;}
+.hist-info{min-width:0;}
+.hist-line1{font-weight:700;font-size:13.5px;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;}
+.hist-type{
+  font-size:11px;font-weight:700;color:var(--navy);
+  background:var(--accent-soft);border-radius:4px;padding:1px 7px;flex:none;
+}
+.hist-line2{font-size:12px;color:var(--muted);}
+.hist-actions{display:flex;gap:6px;flex:none;}
+.modal-empty{padding:36px 18px;text-align:center;color:var(--muted);font-size:13px;}
+
+/* ---------- Toast ---------- */
+.toast{
+  position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(8px);
+  background:var(--navy-deep);color:#fff;
+  padding:10px 20px;border-radius:8px;font-size:13px;font-weight:600;
+  opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;
+  z-index:99;max-width:90%;box-shadow:0 4px 16px rgba(10,20,40,.3);
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.toast.error{background:var(--danger);}
+
+/* ---------- Narrow screens (tab switching) ---------- */
+@media screen and (max-width: 940px){
+  .app{height:auto;min-height:100vh;}
+  .app-main{flex-direction:column;}
+  .pane-tabs{display:flex;}
+  .form-pane{width:auto;min-width:0;max-width:none;border-right:none;overflow:visible;}
+  .preview-pane{overflow:visible;}
+  .app.view-form .preview-pane{display:none;}
+  .app.view-preview .form-pane{display:none;}
+  .preview-scroll{padding:14px;overflow-x:auto;}
+}
+
+/* ==========================================================
+   Print (use the browser's "Save as PDF" for a PDF copy).
+   Real page margins come from @page. No @page size is forced:
+   the letter prints on the user's default paper, A4 or US
+   Letter, and fits either in one page.
+   ========================================================== */
+@page{margin:20mm 20mm;}
+@media print{
+  html,body{height:auto;background:#fff;}
+  .app{display:block;height:auto;}
+  .app-main{display:block;min-height:0;}
+  .app-header,.pane-tabs,.form-pane,.preview-toolbar,.no-print{display:none !important;}
+  .preview-pane{display:block !important;overflow:visible;background:#fff;}
+  .preview-scroll{padding:0;overflow:visible;}
+  .sheet-scaler{transform:none !important;width:auto !important;height:auto !important;margin:0;}
+  .sheet{
+    width:auto;min-height:0;
+    margin:0;box-shadow:none;padding:0;
+  }
+  .cl-salutation{break-after:avoid;page-break-after:avoid;}
+  .cl-sig{break-inside:avoid;page-break-inside:avoid;}
+  .cl-placeholder{display:none !important;}
+  .modal-backdrop,.toast{display:none !important;}
+}
+</style>
+</head>
+<body>
+<div class="app view-form" id="app">
+
+  <!-- Header -->
+  <header class="app-header">
+    <div class="app-brand">
+      <div class="app-logo">CL</div>
+      <div>
+        <h1>Cover Letter Builder</h1>
+        <div class="sub">Your cover letter never leaves your browser.</div>
+      </div>
+    </div>
+    <div class="app-actions">
+      <button id="btnNew" class="btn btn-ghost" type="button">New</button>
+      <button id="btnSave" class="btn btn-ghost" type="button">Save</button>
+      <button id="btnVersions" class="btn btn-ghost" type="button">Versions</button>
+      <button id="btnExport" class="btn btn-ghost" type="button">Export</button>
+      <button id="btnImport" class="btn btn-ghost" type="button">Import</button>
+      <input type="file" id="importFile" accept=".json,application/json" hidden>
+      <a class="btn btn-ghost" href="/resume/">Resume Builder</a>
+      <a class="btn btn-ghost" href="https://crewlesslab.gumroad.com" target="_blank" rel="noopener" title="Own the offline file version — pay what you want">Offline version</a>
+      <button id="btnPrint" class="btn btn-primary" type="button">Print / Save PDF</button>
+    </div>
+  </header>
+
+  <!-- Tabs for narrow screens -->
+  <div class="pane-tabs">
+    <button id="tabForm" class="tab active" type="button">Edit</button>
+    <button id="tabPreview" class="tab" type="button">Preview</button>
+  </div>
+
+  <main class="app-main">
+
+    <!-- ================= Form ================= -->
+    <section class="form-pane" id="formPane">
+
+      <!-- Version label -->
+      <div class="card">
+        <div class="card-head">Version Label</div>
+        <div class="card-body">
+          <input type="text" id="versionLabel" placeholder='e.g. "Northwind Labs — Senior Designer"' autocomplete="off">
+          <p class="hint">Tailor one letter per application. <b>Save</b> stores the current letter; open <b>Versions</b> to switch back, or duplicate one as a starting point.</p>
+        </div>
+      </div>
+
+      <!-- Your information -->
+      <div class="card">
+        <div class="card-head">Your Information</div>
+        <div class="card-body">
+          <div class="f-grid">
+            <div class="f-field">
+              <label for="fName">Full Name</label>
+              <input type="text" id="fName" placeholder="e.g. Alex Morgan" autocomplete="off">
+            </div>
+            <div class="f-field">
+              <label for="fEmail">Email</label>
+              <input type="email" id="fEmail" placeholder="you@example.com" autocomplete="off">
+            </div>
+            <div class="f-field">
+              <label for="fPhone">Phone</label>
+              <input type="tel" id="fPhone" placeholder="+1 (555) 010-0000" autocomplete="off">
+            </div>
+            <div class="f-field">
+              <label for="fLocation">Location</label>
+              <input type="text" id="fLocation" placeholder="City, State / Country" autocomplete="off">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recipient -->
+      <div class="card">
+        <div class="card-head">Recipient</div>
+        <div class="card-body">
+          <div class="f-grid">
+            <div class="f-field">
+              <label for="tManager">Hiring Manager (if known)</label>
+              <input type="text" id="tManager" placeholder="e.g. Jordan Bell" autocomplete="off">
+            </div>
+            <div class="f-field">
+              <label for="tCompany">Company</label>
+              <input type="text" id="tCompany" placeholder="e.g. Northwind Labs" autocomplete="off">
+            </div>
+            <div class="f-field span2">
+              <label for="tAddress">Company Address (optional)</label>
+              <textarea id="tAddress" rows="2" placeholder="1400 Alder Street&#10;Portland, OR 97205"></textarea>
+            </div>
+          </div>
+          <p class="hint">Leave the manager blank and the letter opens with "Dear Hiring Manager,".</p>
+        </div>
+      </div>
+
+      <!-- Letter details -->
+      <div class="card">
+        <div class="card-head">Letter Details</div>
+        <div class="card-body">
+          <div class="f-grid">
+            <div class="f-field">
+              <label for="lDate">Date</label>
+              <input type="date" id="lDate" autocomplete="off">
+            </div>
+            <div class="f-field">
+              <label for="lValediction">Sign-off</label>
+              <input type="text" id="lValediction" placeholder="Sincerely," autocomplete="off">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Opening -->
+      <div class="card">
+        <div class="card-head">Opening</div>
+        <div class="card-body">
+          <textarea id="fOpening" rows="4" placeholder="I'm writing to apply for the [role] position at [company]. In one or two sentences, say why this role excites you."></textarea>
+          <p class="hint">One short paragraph: the role you're applying for and why. Press Enter to start a new paragraph.</p>
+        </div>
+      </div>
+
+      <!-- Body -->
+      <div class="card">
+        <div class="card-head">Body</div>
+        <div class="card-body">
+          <textarea id="fBody" rows="8" placeholder="Your strongest, most relevant results. One idea per paragraph — press Enter between paragraphs."></textarea>
+          <p class="hint">1-3 paragraphs. Match your proudest results to what the job posting asks for, with numbers where you can.</p>
+        </div>
+      </div>
+
+      <!-- Closing -->
+      <div class="card">
+        <div class="card-head">Closing</div>
+        <div class="card-body">
+          <textarea id="fClosing" rows="3" placeholder="Restate your interest, thank the reader, and invite next steps."></textarea>
+          <p class="hint">One short paragraph. The sign-off and your name are added automatically below it.</p>
+        </div>
+      </div>
+
+      <p class="hint" style="text-align:center;">
+        Everything is saved automatically in this browser only - nothing is ever uploaded.<br>
+        Press Ctrl (Mac: Cmd) + S to save the current version.<br>
+        <a href="https://crewlesslab.com/" style="color:var(--muted);">Made by Crewless Lab &#8212; crewlesslab.com</a>
+      </p>
+    </section>
+
+    <!-- ================= Preview ================= -->
+    <section class="preview-pane" id="previewPane">
+      <div class="preview-toolbar">
+        <b>Preview</b>
+        <div class="segmented" id="templateSeg" role="group" aria-label="Template">
+          <button type="button" data-template="classic" class="active">Classic</button>
+          <button type="button" data-template="modern">Modern</button>
+        </div>
+        <span>Fits A4 &amp; US Letter, 1 page</span>
+        <span style="margin-left:auto;"></span>
+        <button type="button" id="btnPrint2" class="btn btn-soft btn-sm no-print">Print / Save PDF</button>
+      </div>
+      <div class="preview-scroll" id="previewScroll">
+        <div class="sheet-scaler" id="sheetScaler">
+          <div class="sheet tpl-classic" id="sheet"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- Versions modal -->
+<div class="modal-backdrop" id="versionsModal">
+  <div class="modal" role="dialog" aria-modal="true" aria-label="Saved cover letter versions">
+    <div class="modal-head">
+      <span>Saved Versions</span>
+      <button type="button" id="btnVersionsClose" class="btn btn-soft btn-sm">Close</button>
+    </div>
+    <div class="modal-body" id="versionsList"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status"></div>
+<script>
+'use strict';
+/* ==========================================================================
+ * Cover Letter Builder (Crewless Lab)
+ *
+ * Layout of this script:
+ *   1. Storage layer (localStorage, prefix "covl_")
+ *   2. Utilities
+ *   3. Pure letter logic (tested by products/cover-letter-en/tests)
+ *   4. App state and autosave
+ *   5. Sheet preview rendering (XSS-safe: textContent only)
+ *   6. Versions (save / open / duplicate / delete)
+ *   7. Backup (export / import)
+ *   8. View switching, events and init
+ * ========================================================================== */
+
+/* ============================ 1. Storage layer ============================ */
+
+const LS_PREFIX = 'covl_';
+
+// If localStorage is unavailable (e.g. some private-browsing modes),
+// fall back to an in-memory store (data lasts for the session only).
+const rawStorage = (() => {
+  try {
+    const t = LS_PREFIX + '__test__';
+    localStorage.setItem(t, '1');
+    localStorage.removeItem(t);
+    return { impl: localStorage, persistent: true };
+  } catch (e) {
+    const mem = {};
+    return {
+      impl: {
+        getItem: (k) => (k in mem ? mem[k] : null),
+        setItem: (k, v) => { mem[k] = String(v); },
+        removeItem: (k) => { delete mem[k]; },
+      },
+      persistent: false,
+    };
+  }
+})();
+
+const store = {
+  get(key, fallback) {
+    try {
+      const raw = rawStorage.impl.getItem(LS_PREFIX + key);
+      if (raw === null || raw === undefined) return fallback;
+      return JSON.parse(raw);
+    } catch (e) {
+      return fallback;
+    }
+  },
+  set(key, value) {
+    try {
+      rawStorage.impl.setItem(LS_PREFIX + key, JSON.stringify(value));
+      return true;
+    } catch (e) {
+      showToast('Could not save. Browser storage may be full.', true);
+      return false;
+    }
+  },
+  remove(key) {
+    try { rawStorage.impl.removeItem(LS_PREFIX + key); } catch (e) { /* noop */ }
+  },
+};
+
+/* ============================== 2. Utilities ============================== */
+
+const $  = (sel, root) => (root || document).querySelector(sel);
+const $$ = (sel, root) => Array.prototype.slice.call((root || document).querySelectorAll(sel));
+
+function el(tag, className, text) {
+  const node = document.createElement(tag);
+  if (className) node.className = className;
+  if (text !== undefined && text !== null) node.textContent = text; // XSS-safe: always textContent
+  return node;
+}
+
+function deepCopy(obj) {
+  return JSON.parse(JSON.stringify(obj));
+}
+
+let toastTimer = null;
+function showToast(msg, isError) {
+  const t = $('#toast');
+  if (!t) return;
+  t.textContent = msg;
+  t.classList.toggle('error', !!isError);
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), isError ? 4200 : 2400);
+}
+
+/* ========================= 3. Pure letter logic ========================= */
+/* @pure-start — no DOM access in this block. The node test runner
+   (products/cover-letter-en/tests/run-tests.js) extracts and runs it. */
+
+const TEMPLATES = ['classic', 'modern'];
+
+const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December'];
+
+// Split a textarea value into trimmed, non-empty lines (paragraphs / address lines)
+function splitLines(text) {
+  return String(text || '').split('\n').map((s) => s.trim()).filter(Boolean);
+}
+
+// Local date as YYYY-MM-DD (the value format of <input type="date">)
+function todayISO(now) {
+  const d = (now && typeof now.getFullYear === 'function') ? now : new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+// "2026-03-05" -> "March 5, 2026". Non-ISO input passes through unchanged
+// (so imported data with free-text dates still prints something sensible).
+function formatLetterDate(value) {
+  const v = String(value || '').trim();
+  if (!v) return '';
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(v);
+  if (!m) return v;
+  const year = Number(m[1]);
+  const month = Number(m[2]);
+  const day = Number(m[3]);
+  if (month < 1 || month > 12 || day < 1 || day > 31) return v;
+  return `${MONTH_NAMES[month - 1]} ${day}, ${year}`;
+}
+
+// "Jordan Bell" -> "Dear Jordan Bell," / blank -> "Dear Hiring Manager,"
+function salutationFor(manager) {
+  const name = String(manager || '').trim().replace(/[\s,.;:]+$/, '');
+  return name ? `Dear ${name},` : 'Dear Hiring Manager,';
+}
+
+function newLetter() {
+  return {
+    id: null,
+    savedAt: null,
+    label: '',
+    template: 'classic',
+    date: todayISO(),
+    from: { name: '', email: '', phone: '', location: '' },
+    to: { manager: '', company: '', address: '' },
+    opening: '',
+    body: '',
+    closing: '',
+    valediction: 'Sincerely,',
+  };
+}
+
+// Fill in any missing fields when loading stored data (forward compatibility)
+function sanitizeLetter(raw) {
+  const base = newLetter();
+  const d = (raw && typeof raw === 'object') ? Object.assign(base, raw) : base;
+
+  d.label = String(d.label || '');
+  d.template = TEMPLATES.includes(d.template) ? d.template : 'classic';
+  d.date = String(d.date || '');
+
+  const f = Object.assign(newLetter().from, (raw && raw.from) || {});
+  Object.keys(f).forEach((k) => { f[k] = String(f[k] || ''); });
+  d.from = f;
+
+  const t = Object.assign(newLetter().to, (raw && raw.to) || {});
+  Object.keys(t).forEach((k) => { t[k] = String(t[k] || ''); });
+  d.to = t;
+
+  d.opening = String(d.opening || '');
+  d.body = String(d.body || '');
+  d.closing = String(d.closing || '');
+  d.valediction = String(d.valediction || '').trim() ? String(d.valediction) : 'Sincerely,';
+
+  return d;
+}
+
+// True when the letter holds no user content (default date / template /
+// sign-off do not count, so #sample can never overwrite real work).
+function letterIsEmpty(d) {
+  const f = d.from;
+  const t = d.to;
+  return !(f.name.trim() || f.email.trim() || f.phone.trim() || f.location.trim() ||
+    t.manager.trim() || t.company.trim() || t.address.trim() ||
+    d.opening.trim() || d.body.trim() || d.closing.trim());
+}
+
+// Recipient address block: manager, company, then address lines
+function recipientBlockLines(d) {
+  const lines = [];
+  const manager = String(d.to.manager || '').trim();
+  const company = String(d.to.company || '').trim();
+  if (manager) lines.push(manager);
+  if (company) lines.push(company);
+  splitLines(d.to.address).forEach((l) => lines.push(l));
+  return lines;
+}
+
+// Sender contact line parts, blanks removed
+function senderContactParts(from) {
+  return [from.email, from.phone, from.location]
+    .map((s) => String(s || '').trim()).filter(Boolean);
+}
+
+function versionDisplayLabel(d) {
+  return String(d.label || '').trim() || String(d.to.company || '').trim() || '(no label)';
+}
+
+// A backup payload is valid when it was exported by this app
+function isValidBackup(payload) {
+  return !!(payload && typeof payload === 'object' && payload.app === 'covl' &&
+    payload.data && typeof payload.data === 'object');
+}
+
+// Filename-safe document title used while printing (Save as PDF suggestion)
+function pdfTitleFor(name) {
+  const clean = String(name || '').replace(/[\\/:*?"<>|]/g, '').trim().slice(0, 40);
+  return [clean, 'Cover Letter'].filter(Boolean).join(' - ');
+}
+
+/* ---- Built-in sample letter (loaded via #sample when the draft is empty,
+        used for store screenshots and quick demos - never overwrites work) ---- */
+function sampleLetter() {
+  return {
+    label: 'Northwind Labs — Senior Product Designer',
+    template: 'classic',
+    date: todayISO(),
+    from: {
+      name: 'Alex Morgan',
+      email: 'alex.morgan@example.com',
+      phone: '+1 (555) 010-7788',
+      location: 'Portland, OR',
+    },
+    to: {
+      manager: 'Jordan Bell',
+      company: 'Northwind Labs',
+      address: '1400 Alder Street\nPortland, OR 97205',
+    },
+    opening: "I'm writing to apply for the Senior Product Designer role at Northwind Labs. I've followed your analytics platform since its launch, and the chance to design tools that 40,000 people rely on every week is exactly the kind of problem I want to own.",
+    body: "At Brightpath Software I led the redesign of our onboarding flow, cutting time-to-first-value from 9 minutes to 4 and lifting trial-to-paid conversion by 18%. Earlier, at Studio Fern, I shipped interfaces across 20+ client engagements, which taught me to move quickly without losing craft.\nWhat I'd bring to Northwind is the habit of pairing every design decision with a measurable outcome: each project above started with a metric we wanted to move and ended with a number we could point to.",
+    closing: "I'd welcome the chance to talk about how I could contribute to the design team at Northwind Labs. Thank you for your time and consideration.",
+    valediction: 'Sincerely,',
+  };
+}
+
+/* @pure-end */
+
+/* ==================== 4. App state and autosave ==================== */
+
+let doc = sanitizeLetter(store.get('draft', null));
+
+let draftTimer = null;
+function scheduleDraft() {
+  clearTimeout(draftTimer);
+  draftTimer = setTimeout(() => store.set('draft', doc), 350);
+}
+
+// Common handler for any letter change
+function onDocChanged() {
+  renderPreview();
+  scheduleDraft();
+}
+
+/* ===================== 5. Sheet preview rendering ===================== */
+/* All user input reaches the DOM via textContent only (XSS-safe). */
+
+function appendParagraphs(parent, text) {
+  splitLines(text).forEach((p) => parent.appendChild(el('p', 'cl-p', p)));
+}
+
+function renderPreview() {
+  const sheet = $('#sheet');
+  sheet.textContent = '';
+  sheet.className = 'sheet tpl-' + doc.template;
+
+  const name = doc.from.name.trim() || 'Your Name';
+  const contact = senderContactParts(doc.from);
+
+  if (doc.template === 'modern') {
+    const head = el('header', 'cl-m-head');
+    head.appendChild(el('div', 'cl-m-name', name));
+    if (contact.length) {
+      const line = el('div', 'cl-m-contact');
+      contact.forEach((p, i) => {
+        if (i > 0) line.appendChild(el('span', 'cl-dot', '•'));
+        line.appendChild(el('span', null, p));
+      });
+      head.appendChild(line);
+    }
+    sheet.appendChild(head);
+  } else {
+    const sender = el('div', 'cl-sender');
+    sender.appendChild(el('div', 'cl-sender-name', name));
+    contact.forEach((p) => sender.appendChild(el('div', 'cl-sender-line', p)));
+    sheet.appendChild(sender);
+  }
+
+  const dateStr = formatLetterDate(doc.date);
+  if (dateStr) sheet.appendChild(el('div', 'cl-date', dateStr));
+
+  const rcpt = recipientBlockLines(doc);
+  if (rcpt.length) {
+    const block = el('div', 'cl-recipient');
+    rcpt.forEach((l) => block.appendChild(el('div', null, l)));
+    sheet.appendChild(block);
+  }
+
+  sheet.appendChild(el('div', 'cl-salutation', salutationFor(doc.to.manager)));
+
+  const bodyWrap = el('div', 'cl-body');
+  appendParagraphs(bodyWrap, doc.opening);
+  appendParagraphs(bodyWrap, doc.body);
+  appendParagraphs(bodyWrap, doc.closing);
+  if (!bodyWrap.childNodes.length) {
+    bodyWrap.appendChild(el('p', 'cl-p cl-placeholder',
+      'Your letter will appear here as you type - start with the Opening section.'));
+  }
+  sheet.appendChild(bodyWrap);
+
+  const sig = el('div', 'cl-sig');
+  sig.appendChild(el('div', 'cl-valediction', doc.valediction.trim() || 'Sincerely,'));
+  sig.appendChild(el('div', 'cl-signame', name));
+  sheet.appendChild(sig);
+
+  fitPreview();
+}
+
+/* Scale the preview to the pane width (print CSS restores 1:1) */
+function fitPreview() {
+  const scroll = $('#previewScroll');
+  const scaler = $('#sheetScaler');
+  const sheet = $('#sheet');
+  if (!scroll || !scaler || !sheet) return;
+  const avail = scroll.clientWidth - 44;
+  if (avail <= 0) return;
+  const w = sheet.offsetWidth;
+  const h = sheet.offsetHeight;
+  const scale = Math.min(1, avail / w);
+  scaler.style.transform = scale < 1 ? `scale(${scale})` : 'none';
+  scaler.style.width = Math.round(w * scale) + 'px';
+  scaler.style.height = Math.round(h * scale) + 'px';
+}
+
+/* ---- Template switching ---- */
+
+function setTemplate(t) {
+  doc.template = TEMPLATES.includes(t) ? t : 'classic';
+  $$('#templateSeg button').forEach((b) => b.classList.toggle('active', b.dataset.template === doc.template));
+  onDocChanged();
+}
+
+/* ---- Form sync ---- */
+
+function syncFormFromState() {
+  $('#versionLabel').value = doc.label;
+  $('#fName').value = doc.from.name;
+  $('#fEmail').value = doc.from.email;
+  $('#fPhone').value = doc.from.phone;
+  $('#fLocation').value = doc.from.location;
+  $('#tManager').value = doc.to.manager;
+  $('#tCompany').value = doc.to.company;
+  $('#tAddress').value = doc.to.address;
+  $('#lDate').value = doc.date;
+  $('#lValediction').value = doc.valediction;
+  $('#fOpening').value = doc.opening;
+  $('#fBody').value = doc.body;
+  $('#fClosing').value = doc.closing;
+  $$('#templateSeg button').forEach((b) => b.classList.toggle('active', b.dataset.template === doc.template));
+}
+
+/* ========== 6. Versions (save / open / duplicate / delete) ========== */
+
+function saveDoc() {
+  if (!doc.id) doc.id = 'c' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+  doc.savedAt = new Date().toISOString();
+  const raw = store.get('letters', []);
+  const list = Array.isArray(raw) ? raw : [];
+  const idx = list.findIndex((d) => d.id === doc.id);
+  const copy = deepCopy(doc);
+  if (idx >= 0) list[idx] = copy; else list.unshift(copy);
+  if (store.set('letters', list)) showToast('Saved to Versions.');
+  scheduleDraft();
+}
+
+function loadDoc(d) {
+  doc = sanitizeLetter(deepCopy(d));
+  syncFormFromState();
+  onDocChanged();
+  showToast('Version loaded.');
+}
+
+function duplicateDoc(d) {
+  const copy = sanitizeLetter(deepCopy(d));
+  copy.id = null;
+  copy.savedAt = null;
+  copy.label = (copy.label.trim() ? copy.label.trim() + ' (copy)' : '(copy)');
+  doc = copy;
+  syncFormFromState();
+  onDocChanged();
+  showToast('Duplicated. Tailor it for the new application, then Save.');
+}
+
+function openVersions() {
+  renderVersions();
+  $('#versionsModal').classList.add('show');
+}
+
+function closeVersions() {
+  $('#versionsModal').classList.remove('show');
+}
+
+function renderVersions() {
+  const listEl = $('#versionsList');
+  listEl.textContent = '';
+  const docs = store.get('letters', []);
+  if (!Array.isArray(docs) || docs.length === 0) {
+    listEl.appendChild(el('div', 'modal-empty',
+      'No saved versions yet. Use "Save" in the header to keep the current letter here - one version per application works well.'));
+    return;
+  }
+  const sorted = docs.slice().sort((a, b) => String(b.savedAt || '').localeCompare(String(a.savedAt || '')));
+  sorted.forEach((d) => {
+    const sd = sanitizeLetter(deepCopy(d));
+    const row = el('div', 'hist-item');
+
+    const info = el('div', 'hist-info');
+    const line1 = el('div', 'hist-line1');
+    line1.appendChild(el('span', 'hist-type', sd.template === 'modern' ? 'Modern' : 'Classic'));
+    line1.appendChild(el('span', null, versionDisplayLabel(sd)));
+    if (sd.from.name.trim()) line1.appendChild(el('span', null, sd.from.name.trim()));
+    info.appendChild(line1);
+    const savedStr = d.savedAt ? new Date(d.savedAt).toLocaleString('en-US') : '';
+    const bits = [sd.to.company.trim(), savedStr ? 'saved ' + savedStr : ''].filter(Boolean);
+    info.appendChild(el('div', 'hist-line2', bits.join(' / ')));
+    row.appendChild(info);
+
+    const actions = el('div', 'hist-actions');
+    const btnOpen = el('button', 'btn btn-soft btn-sm', 'Open');
+    btnOpen.type = 'button';
+    btnOpen.addEventListener('click', () => { loadDoc(sd); closeVersions(); });
+    const btnDup = el('button', 'btn btn-soft btn-sm', 'Duplicate');
+    btnDup.type = 'button';
+    btnDup.addEventListener('click', () => { duplicateDoc(sd); closeVersions(); });
+    const btnDel = el('button', 'btn btn-danger-soft btn-sm', 'Delete');
+    btnDel.type = 'button';
+    btnDel.addEventListener('click', () => {
+      if (!confirm(`Delete version "${versionDisplayLabel(sd)}"? This cannot be undone.`)) return;
+      const cur = store.get('letters', []);
+      store.set('letters', (Array.isArray(cur) ? cur : []).filter((x) => x.id !== d.id));
+      renderVersions();
+      showToast('Deleted.');
+    });
+    actions.appendChild(btnOpen);
+    actions.appendChild(btnDup);
+    actions.appendChild(btnDel);
+    row.appendChild(actions);
+    listEl.appendChild(row);
+  });
+}
+
+/* =================== 7. Backup (export / import) =================== */
+
+function exportData() {
+  const payload = {
+    app: 'covl',
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    data: {
+      letters: store.get('letters', []),
+      draft: doc,
+    },
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `cover-letter-backup-${todayISO().replace(/-/g, '')}.json`;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 0);
+  showToast('Backup (JSON) downloaded.');
+}
+
+function importData(file) {
+  const reader = new FileReader();
+  reader.onload = () => {
+    let payload;
+    try { payload = JSON.parse(String(reader.result)); } catch (e) {
+      showToast('Could not read that JSON file.', true);
+      return;
+    }
+    if (!isValidBackup(payload)) {
+      showToast('That is not a backup file from this app.', true);
+      return;
+    }
+    if (!confirm('Import this backup? Your current draft and saved versions will be overwritten.')) return;
+    const d = payload.data;
+    if (Array.isArray(d.letters)) store.set('letters', d.letters);
+    if (d.draft) store.set('draft', d.draft);
+    doc = sanitizeLetter(store.get('draft', null));
+    syncFormFromState();
+    renderPreview();
+    showToast('Backup imported.');
+  };
+  reader.readAsText(file);
+}
+
+/* ============== 8. View switching, events and init ============== */
+
+function setView(view) {
+  const app = $('#app');
+  app.classList.toggle('view-form', view === 'form');
+  app.classList.toggle('view-preview', view === 'preview');
+  $('#tabForm').classList.toggle('active', view === 'form');
+  $('#tabPreview').classList.toggle('active', view === 'preview');
+  if (view === 'preview') fitPreview();
+}
+
+const APP_TITLE = document.title;
+
+function bindEvents() {
+  /* Header actions */
+  $('#btnNew').addEventListener('click', () => {
+    if (!confirm('Start a new cover letter? Unsaved changes to the current one will be discarded.')) return;
+    doc = newLetter();
+    syncFormFromState();
+    onDocChanged();
+    showToast('New cover letter created.');
+  });
+  $('#btnSave').addEventListener('click', saveDoc);
+  $('#btnVersions').addEventListener('click', openVersions);
+  $('#btnVersionsClose').addEventListener('click', closeVersions);
+  $('#versionsModal').addEventListener('click', (e) => {
+    if (e.target === e.currentTarget) closeVersions();
+  });
+  $('#btnExport').addEventListener('click', exportData);
+  $('#btnImport').addEventListener('click', () => $('#importFile').click());
+  $('#importFile').addEventListener('change', (e) => {
+    const f = e.target.files[0];
+    if (f) importData(f);
+    e.target.value = '';
+  });
+  $('#btnPrint').addEventListener('click', () => window.print());
+  $('#btnPrint2').addEventListener('click', () => window.print());
+
+  /* Tabs */
+  $('#tabForm').addEventListener('click', () => setView('form'));
+  $('#tabPreview').addEventListener('click', () => setView('preview'));
+
+  /* Template switch */
+  $('#templateSeg').addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-template]');
+    if (btn) setTemplate(btn.dataset.template);
+  });
+
+  /* Version label */
+  $('#versionLabel').addEventListener('input', (e) => { doc.label = e.target.value; scheduleDraft(); });
+
+  /* Simple field bindings */
+  const bindFrom = (id, key) => {
+    $(id).addEventListener('input', (e) => { doc.from[key] = e.target.value; onDocChanged(); });
+  };
+  bindFrom('#fName', 'name');
+  bindFrom('#fEmail', 'email');
+  bindFrom('#fPhone', 'phone');
+  bindFrom('#fLocation', 'location');
+
+  const bindTo = (id, key) => {
+    $(id).addEventListener('input', (e) => { doc.to[key] = e.target.value; onDocChanged(); });
+  };
+  bindTo('#tManager', 'manager');
+  bindTo('#tCompany', 'company');
+  bindTo('#tAddress', 'address');
+
+  $('#lDate').addEventListener('input', (e) => { doc.date = e.target.value; onDocChanged(); });
+  $('#lValediction').addEventListener('input', (e) => { doc.valediction = e.target.value; onDocChanged(); });
+  $('#fOpening').addEventListener('input', (e) => { doc.opening = e.target.value; onDocChanged(); });
+  $('#fBody').addEventListener('input', (e) => { doc.body = e.target.value; onDocChanged(); });
+  $('#fClosing').addEventListener('input', (e) => { doc.closing = e.target.value; onDocChanged(); });
+
+  /* Keyboard shortcuts */
+  document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
+      e.preventDefault();
+      saveDoc();
+    }
+    if (e.key === 'Escape') closeVersions();
+  });
+
+  /* While printing, set the title so "Save as PDF" suggests a useful filename */
+  window.addEventListener('beforeprint', () => {
+    document.title = pdfTitleFor(doc.from.name);
+  });
+  window.addEventListener('afterprint', () => { document.title = APP_TITLE; });
+
+  window.addEventListener('resize', fitPreview);
+}
+
+/* Load the built-in sample via #sample / #sample-modern - only when the
+   current draft is empty, so it can never overwrite real work. */
+function maybeLoadSample() {
+  const h = String(location.hash || '');
+  if (!/^#sample(-classic|-modern)?$/.test(h)) return;
+  if (!letterIsEmpty(doc)) return;
+  doc = sanitizeLetter(sampleLetter());
+  if (h === '#sample-modern') doc.template = 'modern';
+}
+
+function init() {
+  maybeLoadSample();
+  bindEvents();
+  syncFormFromState();
+  renderPreview();
+  if (!rawStorage.persistent) {
+    showToast('This browser cannot store data persistently (private browsing?). Use Export to back up your work.', true);
+  }
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
+</script>
+</body>
+</html>
