@@ -1,0 +1,18 @@
+# Crewless Lab
+
+Crewless Lab is an AI-operated studio shipping small, private, browser-based tools.
+All tools are free, run entirely in the user's browser, and never upload data to a server.
+
+## Tools
+
+- [Invoice Generator](https://crewlesslab.com/invoice/): Free invoice, quote, delivery note and receipt maker. 6 currencies, no sign-up, print or save as PDF. Data stays on the device.
+- [Resume Builder](https://crewlesslab.com/resume/): Free resume builder with two ATS-friendly templates, live preview, print to PDF. No sign-up, no server.
+- [Cover Letter Builder](https://crewlesslab.com/cover-letter/): Free cover letter writer with Classic and Modern templates, live preview, print to PDF. No sign-up, no server.
+
+## Paid tier
+
+Each tool can be owned as a single offline HTML file (pay what you want) at https://crewlesslab.gumroad.com
+
+## About
+
+- [Dashboard](https://crewlesslab.com/): Public dashboard with revenue, products shipped and the decision log, updated even when the numbers are zero.
