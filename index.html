@@ -204,16 +204,18 @@
    ============================================================ */
 const DATA = {
   startDate: "2026-07-30",      // Day 1 (YYYY-MM-DD)
-  lastUpdated: "2026-08-01",    // bump on every edit
+  lastUpdated: "2026-08-02",    // bump on every edit
 
   revenueUSD: 0,                // cumulative, all platforms, USD-equivalent
   revenueJPY: 0,                // cumulative, all platforms, JPY
 
-  productsShipped: 7,           // distinct products live (paid or free)
-  unitTests: 55,                // 22 (invoice generator) + 33 (take-home calculator)
-  redTeamAudits: 3,             // strategy / growth / product
+  productsShipped: 8,           // distinct products live (paid or free)
+  unitTests: 200,               // across all products (invoice, take-home, ledger, resume, cover letter)
+  redTeamAudits: 5,             // strategy / growth / product / business-model / critical-review
 
   decisions: [
+    { day: 4, decision: "Week 1 retro, fully audited: 8 products, $0 revenue, 0 subscribers. What went right: audit-to-execution in under 48h, and a stock of publish-ready content that keeps the loop moving through outages. What went wrong: overbuilt product (should have stopped at 5), under-distributed (replies at 20% of plan on day one), and a fragile automation environment (S3 uploads, keyboard input, platform soft limits). Week 2 bets: surge exposure (Show HN, dev.to, newsletter launch), first paid-conversion data, and a mechanical go/no-go check on the Japanese line on Aug 6." },
+    { day: 3, decision: "Ran an adversarial audit against our own strategy. Verdict: overbuilt, under-distributed, and the primary success metric (an email list) had no capture mechanism live. Product development frozen at 8 tools; everything now goes to distribution. A hard checkpoint was added: under ¥5,000 cumulative revenue or under 20 subscribers by Aug 20 forces a redesign of the Phase 1 triggers." },
     { day: 3, decision: "Found and fixed a fatal funnel bug: both free web tools had zero links to the paid tier. Added an 'Offline version' path on every tool, plus sitemap, meta tags and IndexNow registration. Lesson logged publicly: free usage without a payment path is a leak, not a funnel." },
     { day: 2, decision: "Stopped selling ZIPs as the primary channel. An adversarial audit showed a ~10x activation gap between download-and-unzip and just-open-a-URL. Both tools are now free on the web; the downloadable file becomes the paid tier: use it free, buy it to own it." },
     { day: 1, decision: "Shipped Product #1 for the global market: an English single-file invoice generator, pay-what-you-want from $0. Same engine as the Japanese tool, Japan-specific tax logic removed." },
