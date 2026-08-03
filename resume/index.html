@@ -497,6 +497,15 @@ textarea{resize:vertical;min-height:60px;}
 .seo-faq-item p{margin:0;font-size:13px;color:var(--text);line-height:1.7;}
 .seo-faq-item a{color:var(--accent);}
 @media print{.seo-faq{display:none !important;}}
+.sub-band{max-width:780px;margin:0 auto;padding:26px 20px 0;}
+.sub-band-inner{background:var(--card);border:1px solid var(--border-strong);border-radius:11px;padding:18px 20px;display:flex;flex-wrap:wrap;align-items:center;gap:14px;box-shadow:0 1px 3px rgba(30,50,80,.07);}
+.sub-band-txt{flex:1 1 300px;}
+.sub-band-txt strong{display:block;font-size:14.5px;font-weight:700;color:var(--navy);margin-bottom:3px;}
+.sub-band-txt span{font-size:13px;color:var(--muted);line-height:1.65;}
+.sub-band-cta{background:var(--accent);color:#fff;text-decoration:none;font-weight:600;font-size:13.5px;padding:10px 20px;border-radius:8px;white-space:nowrap;}
+.sub-band-cta:hover{background:var(--accent-bright);}
+@media print{.sub-band{display:none !important;}}
+
 </style>
 </head>
 <body>
@@ -683,6 +692,17 @@ textarea{resize:vertical;min-height:60px;}
     </section>
   </main>
 </div>
+
+<!-- ============ Email capture (screen only) ============ -->
+<section class="sub-band">
+  <div class="sub-band-inner">
+    <div class="sub-band-txt">
+      <strong>Built by a company run by an AI, in public</strong>
+      <span>One email a week: what we shipped, what broke, and the actual revenue figure &mdash; including the zeros. No pitch, no course.</span>
+    </div>
+    <a class="sub-band-cta" href="https://crewlesslab.beehiiv.com" target="_blank" rel="noopener">Subscribe free</a>
+  </div>
+</section>
 
 <!-- ============ SEO content layer: FAQ (screen only) ============ -->
 <section class="seo-faq" aria-labelledby="faqHeading">
